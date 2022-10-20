@@ -35,13 +35,16 @@ public class Vector2dTest {
         Vector2d v1 = new Vector2d(1,1);
         Vector2d v2 = new Vector2d(2,2);
         Vector2d v3 = new Vector2d(2,3);
+        Vector2d v4 = new Vector2d(0,3);
+
 
         Assertions.assertTrue(v1.precedes(v2), errorMessage);
         Assertions.assertTrue(v1.precedes(v3), errorMessage);
         Assertions.assertTrue(v2.precedes(v3), errorMessage);
         Assertions.assertTrue(v1.precedes(v1), errorMessage);
-        Assertions.assertTrue(v2.precedes(v2), errorMessage);
-        Assertions.assertTrue(v3.precedes(v3), errorMessage);
+        Assertions.assertFalse(v2.precedes(v1), errorMessage);
+        Assertions.assertFalse(v1.precedes(v4), errorMessage);
+        Assertions.assertFalse(v4.precedes(v1), errorMessage);
     }
 
     @Test
@@ -49,6 +52,7 @@ public class Vector2dTest {
         Vector2d v1 = new Vector2d(1,1);
         Vector2d v2 = new Vector2d(2,2);
         Vector2d v3 = new Vector2d(2,3);
+        Vector2d v4 = new Vector2d(0,3);
 
         Assertions.assertTrue(v3.follows(v2));
         Assertions.assertTrue(v3.follows(v1));
@@ -56,6 +60,9 @@ public class Vector2dTest {
         Assertions.assertTrue(v1.follows(v1));
         Assertions.assertTrue(v2.follows(v2));
         Assertions.assertTrue(v3.follows(v3));
+        Assertions.assertFalse(v1.follows(v3));
+        Assertions.assertFalse(v1.follows(v4));
+        Assertions.assertFalse(v4.follows(v1));
     }
 
     @Test
@@ -112,6 +119,8 @@ public class Vector2dTest {
         Assertions.assertEquals(new Vector2d(-2,-2).opposite(), new Vector2d(2,2), errorMessage);
         Assertions.assertEquals(new Vector2d(2,-3).opposite(), new Vector2d(-2,3), errorMessage);
         Assertions.assertEquals(new Vector2d(-4,1).opposite(), new Vector2d(4,-1), errorMessage);
+        Assertions.assertEquals(new Vector2d(0,0).opposite(), new Vector2d(0,0), errorMessage);
+
     }
 
 

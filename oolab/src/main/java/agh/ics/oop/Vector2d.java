@@ -47,15 +47,13 @@ public class Vector2d {
     public boolean equals(Object other){
         if (this == other)
             return true;
-        if (!(other instanceof Vector2d))
+        if (!(other instanceof Vector2d that))
             return false;
-        Vector2d that = (Vector2d) other;
-        return Integer.compare(that.x, this.x) == 0
-                && Integer.compare(that.y, this.y) == 0;
+        return that.x == this.x && that.y == this.y;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        return Objects.hash(this.x, this.y);
     }
 }
