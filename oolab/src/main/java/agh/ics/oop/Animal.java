@@ -41,15 +41,13 @@ public class Animal {
         switch (direction){
             case FORWARD -> {
                 possible_position = position.add(orientation.toUnitVector());
-                if (!map.canMoveTo(possible_position))
-                    return;
-                position = possible_position;
+                if (map.canMoveTo(possible_position))
+                    position = possible_position;
             }
             case BACKWARD -> {
                 possible_position = position.subtract(orientation.toUnitVector());
-                if (!map.canMoveTo(possible_position))
-                    return;
-                position = possible_position;
+                if (map.canMoveTo(possible_position))
+                    position = possible_position;
             }
             case LEFT -> orientation = orientation.previous();
             case RIGHT -> orientation = orientation.next();

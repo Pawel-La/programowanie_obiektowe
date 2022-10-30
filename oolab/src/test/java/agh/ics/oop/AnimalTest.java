@@ -56,4 +56,17 @@ public class AnimalTest {
 //        (3,4) north
         Assertions.assertEquals(animal.getPosition(), new Vector2d(3,4), errorMessage);
     }
+
+    @Test
+    public void toStringTest(){
+        Animal animal = new Animal();
+        Assertions.assertEquals(animal.toString(), "N");
+        animal.move(MoveDirection.RIGHT);
+        Assertions.assertEquals(animal.toString(), "E");
+        animal.move(MoveDirection.RIGHT);
+        Assertions.assertEquals(animal.toString(), "S");
+        animal.move(MoveDirection.RIGHT);
+        Assertions.assertEquals(animal.toString(), "W");
+    }
+
 }
