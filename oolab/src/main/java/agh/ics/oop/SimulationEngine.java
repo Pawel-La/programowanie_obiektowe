@@ -5,7 +5,7 @@ import java.util.List;
 
 public class SimulationEngine implements IEngine{
     private final MoveDirection [] directions;
-    List<Animal> animals = new ArrayList<>();
+    private final List<Animal> animals = new ArrayList<>();
     SimulationEngine(MoveDirection [] directions, IWorldMap map, Vector2d [] positions){
         this.directions = directions;
         for (Vector2d position: positions){
@@ -16,13 +16,12 @@ public class SimulationEngine implements IEngine{
             }
         }
     }
-
     @Override
     public void run() {
         int animal_num = 0;
         for (MoveDirection direction : directions){
             animals.get(animal_num).move(direction);
-            animal_num ++;
+            animal_num++;
             animal_num %= animals.size();
         }
     }

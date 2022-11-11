@@ -6,7 +6,8 @@ public class World {
 //    Mozna dla kazdego miejsca na mapie przechowywac informacje czy jest zajete czy i na biezaco ją aktualizowac
 //    Biorac pod uwage ze plansza jest mala (2. opcja to przechowywac polozenie wszystkich zwierzat ktore sa juz na mapie)
     public static void main(String[] args) {
-        Animal animal = new Animal();
+        IWorldMap map = new RectangularMap(10,10);
+        Animal animal = new Animal(map, new Vector2d(2,2));
         System.out.println(animal);
 
         Scanner scan = new Scanner(System.in);

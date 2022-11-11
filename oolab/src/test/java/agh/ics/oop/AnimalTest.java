@@ -7,7 +7,9 @@ public class AnimalTest {
     private final String errorMessage = "Test failed!";
     @Test
     public void positionAndOrientationTest(){
-        Animal animal = new Animal();
+        IWorldMap map = new RectangularMap(5,5);
+        Vector2d initialPosition = new Vector2d(2,2);
+        Animal animal = new Animal(map, initialPosition);
 //        (2, 2) north
         animal.move(MoveDirection.FORWARD);
 //        (2, 3) north
@@ -28,7 +30,9 @@ public class AnimalTest {
 
     @Test
     public void outOfMapTest(){
-        Animal animal = new Animal();
+        IWorldMap map = new RectangularMap(5,5);
+        Vector2d initialPosition = new Vector2d(2,2);
+        Animal animal = new Animal(map, initialPosition);
 //        (2, 2) north
         animal.move(MoveDirection.FORWARD);
 //        (2, 3) north
@@ -59,7 +63,9 @@ public class AnimalTest {
 
     @Test
     public void toStringTest(){
-        Animal animal = new Animal();
+        IWorldMap map = new RectangularMap(5,5);
+        Vector2d initialPosition = new Vector2d(2,2);
+        Animal animal = new Animal(map, initialPosition);
         Assertions.assertEquals(animal.toString(), "N");
         animal.move(MoveDirection.RIGHT);
         Assertions.assertEquals(animal.toString(), "E");
