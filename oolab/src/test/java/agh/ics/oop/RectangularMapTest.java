@@ -31,6 +31,7 @@ public class RectangularMapTest {
         Assertions.assertFalse(map.place(animal4));
         Assertions.assertTrue(map.isOccupied(new Vector2d(2,2)));
         Assertions.assertFalse(map.isOccupied(new Vector2d(100,2)));
+        Assertions.assertFalse(map.isOccupied(new Vector2d(10,4)));
         Assertions.assertEquals(map.objectAt(new Vector2d(2,2)), animal1);
     }
 }

@@ -14,11 +14,10 @@ public class RectangularMap extends AbstractWorldMap implements IWorldMap{
         return rightUpperCorner;
     }
     @Override
-    public boolean isOccupied(Vector2d position){
-        return isAnimalHere(position);
-    }
-    @Override
     public Object objectAt(Vector2d position){
-        return animalAt(position);
+        for (IMapElement mapElement: mapElements)
+            if (mapElement.getPosition().equals(position))
+                return mapElement;
+        return null;
     }
 }

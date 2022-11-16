@@ -3,12 +3,11 @@ package agh.ics.oop;
 public class Animal implements IMapElement {
     private MapDirection orientation = MapDirection.NORTH;
     private Vector2d position;
-    private final Vector2d basicPosition = new Vector2d(0,0);
     private final IWorldMap map;
 
     Animal(IWorldMap map){
         this.map = map;
-        this.position = basicPosition;
+        this.position = new Vector2d(0, 0);
     }
     Animal(IWorldMap map, Vector2d initialPosition){
         this.map = map;

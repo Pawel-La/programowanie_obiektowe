@@ -21,6 +21,12 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
             upperRight = mapElement.getPosition().upperRight(upperRight);
         return upperRight;
     }
+    private Boolean isGrassHere(Vector2d position) {
+        for (IMapElement mapElement: mapElements)
+            if (mapElement instanceof Grass && mapElement.getPosition().equals(position))
+                return true;
+        return false;
+    }
     private Vector2d getRandomPosition(){
         int x = (int) (Math.random() * Math.sqrt(10 * num_of_grasses));
         int y = (int) (Math.random() * Math.sqrt(10 * num_of_grasses));
@@ -28,7 +34,7 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
     }
     private void addGrass(){
         Vector2d pos = getRandomPosition();
-        if (!isOccupied(pos)){
+        if (!isGrassHere(pos)){
             mapElements.add(new Grass(pos));
         }
     }
@@ -36,7 +42,7 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
         int size = mapElements.size();
         int idx = -1;
         for (int i = 0; i < size; i++){
-            if (mapElements.get(i).getPosition().equals(position)){
+            if (mapElements.get(i) instanceof Grass && mapElements.get(i).getPosition().equals(position)){
                 idx = i;
                 break;
             }
@@ -47,31 +53,19 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
     }
     @Override
     public boolean canMoveTo(Vector2d position){
-        boolean result = !isAnimalHere(position) &&
-                position.follows(leftLowerCorner) &&
-                position.precedes(rightUpperCorner);
-//        it means that there is a non-animal object at the position
-        if (result && isOccupied(position))
+        boolean result = super.canMoveTo(position);
+        if (result && isGrassHere(position))
             eatGrass(position);
         return result;
     }
     @Override
-    public boolean isOccupied(Vector2d position) {
+    public Object objectAt(Vector2d position) {
         for (IMapElement mapElement: mapElements)
-            if (position.equals(mapElement.getPosition()))
-                return true;
-        return false;
-    }
-    private IMapElement mapElementAt(Vector2d position){
+            if (mapElement instanceof Animal && mapElement.getPosition().equals(position))
+                return mapElement;
         for (IMapElement mapElement: mapElements)
-            if (mapElement.getPosition().equals(position))
+            if (mapElement instanceof Grass && mapElement.getPosition().equals(position))
                 return mapElement;
         return null;
-    }
-    @Override
-    public Object objectAt(Vector2d position) {
-        if (animalAt(position) != null)
-            return animalAt(position);
-        return mapElementAt(position);
     }
 }
