@@ -23,9 +23,9 @@ abstract class AbstractWorldMap implements IWorldMap {
     }
     @Override
     public boolean canMoveTo(Vector2d position){
-        return !isAnimalHere(position) &&
-                position.follows(leftLowerCorner) &&
-                position.precedes(rightUpperCorner);
+        return position.follows(leftLowerCorner) &&
+                position.precedes(rightUpperCorner) &&
+                !isAnimalHere(position);
     }
     @Override
     public boolean place(Animal animal){
@@ -42,5 +42,10 @@ abstract class AbstractWorldMap implements IWorldMap {
         return false;
     }
     @Override
-    public abstract Object objectAt(Vector2d position);
+    public Object objectAt(Vector2d position){
+        for (IMapElement mapElement: mapElements)
+            if (mapElement.getPosition().equals(position))
+                return mapElement;
+        return null;
+    }
 }

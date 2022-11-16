@@ -21,12 +21,6 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
             upperRight = mapElement.getPosition().upperRight(upperRight);
         return upperRight;
     }
-    private Boolean isGrassHere(Vector2d position) {
-        for (IMapElement mapElement: mapElements)
-            if (mapElement instanceof Grass && mapElement.getPosition().equals(position))
-                return true;
-        return false;
-    }
     private Vector2d getRandomPosition(){
         int x = (int) (Math.random() * Math.sqrt(10 * num_of_grasses));
         int y = (int) (Math.random() * Math.sqrt(10 * num_of_grasses));
@@ -34,38 +28,29 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
     }
     private void addGrass(){
         Vector2d pos = getRandomPosition();
-        if (!isGrassHere(pos)){
-            mapElements.add(new Grass(pos));
+        while (isOccupied(pos)){
+            pos = getRandomPosition();
         }
+        mapElements.add(new Grass(pos));
     }
     private void eatGrass(Vector2d position){
         int size = mapElements.size();
         int idx = -1;
         for (int i = 0; i < size; i++){
-            if (mapElements.get(i) instanceof Grass && mapElements.get(i).getPosition().equals(position)){
+            if (mapElements.get(i).getPosition().equals(position)){
                 idx = i;
                 break;
             }
         }
         mapElements.remove(idx);
-        while (mapElements.size() < size)
-            addGrass();
+        addGrass();
     }
     @Override
     public boolean canMoveTo(Vector2d position){
         boolean result = super.canMoveTo(position);
-        if (result && isGrassHere(position))
+//        if result == true then there is no animal at the position
+        if (result && isOccupied(position))
             eatGrass(position);
         return result;
-    }
-    @Override
-    public Object objectAt(Vector2d position) {
-        for (IMapElement mapElement: mapElements)
-            if (mapElement instanceof Animal && mapElement.getPosition().equals(position))
-                return mapElement;
-        for (IMapElement mapElement: mapElements)
-            if (mapElement instanceof Grass && mapElement.getPosition().equals(position))
-                return mapElement;
-        return null;
     }
 }

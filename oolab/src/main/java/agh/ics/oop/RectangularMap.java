@@ -13,11 +13,4 @@ public class RectangularMap extends AbstractWorldMap implements IWorldMap{
     public Vector2d getDrawingUpperRight(){
         return rightUpperCorner;
     }
-    @Override
-    public Object objectAt(Vector2d position){
-        for (IMapElement mapElement: mapElements)
-            if (mapElement.getPosition().equals(position))
-                return mapElement;
-        return null;
-    }
 }
