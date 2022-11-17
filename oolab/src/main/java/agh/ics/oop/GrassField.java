@@ -11,14 +11,14 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
     }
     protected Vector2d getDrawingLowerLeft(){
         Vector2d lowerLeft = rightUpperCorner;
-        for (IMapElement mapElement: mapElements)
-            lowerLeft = mapElement.getPosition().lowerLeft(lowerLeft);
+        for (Vector2d pos: mapElements.keySet())
+            lowerLeft = pos.lowerLeft(lowerLeft);
         return lowerLeft;
     }
     protected Vector2d getDrawingUpperRight(){
         Vector2d upperRight = leftLowerCorner;
-        for (IMapElement mapElement: mapElements)
-            upperRight = mapElement.getPosition().upperRight(upperRight);
+        for (Vector2d pos: mapElements.keySet())
+            upperRight = pos.upperRight(upperRight);
         return upperRight;
     }
     private Vector2d getRandomPosition(){
@@ -27,28 +27,20 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
         return new Vector2d(x,y);
     }
     private void addGrass(){
-        Vector2d pos = getRandomPosition();
-        while (isOccupied(pos)){
+        Vector2d pos;
+        do {
             pos = getRandomPosition();
-        }
-        mapElements.add(new Grass(pos));
+        }while (isOccupied(pos));
+        mapElements.put(pos, new Grass(pos));
     }
     private void eatGrass(Vector2d position){
-        int size = mapElements.size();
-        int idx = -1;
-        for (int i = 0; i < size; i++){
-            if (mapElements.get(i).getPosition().equals(position)){
-                idx = i;
-                break;
-            }
-        }
-        mapElements.remove(idx);
+        mapElements.remove(position);
         addGrass();
     }
     @Override
     public boolean canMoveTo(Vector2d position){
         boolean result = super.canMoveTo(position);
-//        if result == true then there is no animal at the position
+//        if there is no animal yet sth is there then there is grass
         if (result && isOccupied(position))
             eatGrass(position);
         return result;

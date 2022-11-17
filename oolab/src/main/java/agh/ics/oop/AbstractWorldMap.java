@@ -1,51 +1,46 @@
 package agh.ics.oop;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-abstract class AbstractWorldMap implements IWorldMap {
-    protected List<IMapElement> mapElements = new ArrayList<>();
+abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
+    protected Map<Vector2d, IMapElement> mapElements = new HashMap<>();
     protected Vector2d leftLowerCorner;
     protected Vector2d rightUpperCorner;
     protected abstract Vector2d getDrawingLowerLeft();
     protected abstract Vector2d getDrawingUpperRight();
-
     @Override
     public String toString(){
         MapVisualizer mapVisualizer = new MapVisualizer(this);
         return mapVisualizer.draw(getDrawingLowerLeft(), getDrawingUpperRight());
     }
-    protected Boolean isAnimalHere(Vector2d position) {
-        for (IMapElement mapElement: mapElements)
-            if (mapElement instanceof Animal && mapElement.getPosition().equals(position))
-                return true;
-        return false;
-    }
     @Override
     public boolean canMoveTo(Vector2d position){
         return position.follows(leftLowerCorner) &&
                 position.precedes(rightUpperCorner) &&
-                !isAnimalHere(position);
+                !(mapElements.get(position) instanceof Animal);
     }
     @Override
     public boolean place(Animal animal){
-        if (!canMoveTo(animal.getPosition()))
+        Vector2d position = animal.getPosition();
+        if (!canMoveTo(position))
             return false;
-        mapElements.add(animal);
+        mapElements.put(position, animal);
+        animal.addObserver(this);
         return true;
     }
     @Override
     public boolean isOccupied(Vector2d position){
-        for (IMapElement mapElement: mapElements)
-            if (mapElement.getPosition().equals(position))
-                return true;
-        return false;
+        return mapElements.get(position) != null;
     }
     @Override
     public Object objectAt(Vector2d position){
-        for (IMapElement mapElement: mapElements)
-            if (mapElement.getPosition().equals(position))
-                return mapElement;
-        return null;
+        return mapElements.get(position);
+    }
+    @Override
+    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+        IMapElement animal = mapElements.get(oldPosition);
+        mapElements.remove(oldPosition);
+        mapElements.put(newPosition, animal);
     }
 }

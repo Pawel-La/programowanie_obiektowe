@@ -73,7 +73,6 @@ public class GrassFieldTest {
         map.place(animal2);
         map.place(animal3);
         map.place(animal4);
-        Assertions.assertEquals(map.objectAt(new Vector2d(2,2)), animal1);
         animal1.move(MoveDirection.FORWARD);
         Assertions.assertEquals(map.objectAt(new Vector2d(2,3)), animal1);
         animal1.move(MoveDirection.FORWARD);
