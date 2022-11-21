@@ -38,21 +38,23 @@ public class Animal implements IMapElement {
     }
 
     public void move(MoveDirection direction){
-        Vector2d possible_position;
+        Vector2d possible_position, old_position;
 
         switch (direction){
             case FORWARD -> {
                 possible_position = position.add(orientation.toUnitVector());
                 if (map.canMoveTo(possible_position)) {
+                    old_position = position;
                     position = possible_position;
-                    positionChanged(position, possible_position);
+                    positionChanged(old_position, possible_position);
                 }
             }
             case BACKWARD -> {
                 possible_position = position.subtract(orientation.toUnitVector());
                 if (map.canMoveTo(possible_position)){
+                    old_position = position;
                     position = possible_position;
-                    positionChanged(position, possible_position);
+                    positionChanged(old_position, possible_position);
                 }
             }
             case LEFT -> orientation = orientation.previous();
