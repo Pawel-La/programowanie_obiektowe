@@ -12,7 +12,7 @@ public class Animal implements IMapElement {
         this.map = map;
         this.position = new Vector2d(0, 0);
     }
-    Animal(IWorldMap map, Vector2d initialPosition){
+    public Animal(IWorldMap map, Vector2d initialPosition){
         this.map = map;
         this.position = initialPosition;
     }
@@ -33,6 +33,17 @@ public class Animal implements IMapElement {
     public Vector2d getPosition(){
         return position;
     }
+
+    @Override
+    public String getMapElementLookFile() {
+        return switch (this.orientation){
+            case NORTH -> "src/main/resources/up.png";
+            case SOUTH -> "src/main/resources/down.png";
+            case WEST -> "src/main/resources/left.png";
+            case EAST -> "src/main/resources/right.png";
+        };
+    }
+
     public MapDirection getOrientation(){
         return orientation;
     }

@@ -2,39 +2,36 @@ package agh.ics.oop;
 
 public class GrassField extends AbstractWorldMap implements IWorldMap{
     private final int num_of_grasses;
-    GrassField(int num_of_grasses){
+    public GrassField(int num_of_grasses){
         this.num_of_grasses = num_of_grasses;
         for (int i = 0; i < num_of_grasses; i++)
             addGrass();
         leftLowerCorner = new Vector2d(Integer.MIN_VALUE,Integer.MIN_VALUE);
         rightUpperCorner = new Vector2d(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
-    protected Vector2d getDrawingLowerLeft(){
-        Vector2d lowerLeft = rightUpperCorner;
-        for (Vector2d pos: mapElements.keySet())
-            lowerLeft = pos.lowerLeft(lowerLeft);
-        return lowerLeft;
+    public Vector2d getDrawingLowerLeft(){
+        return mapBoundary.getLeftLowerCorner();
     }
-    protected Vector2d getDrawingUpperRight(){
-        Vector2d upperRight = leftLowerCorner;
-        for (Vector2d pos: mapElements.keySet())
-            upperRight = pos.upperRight(upperRight);
-        return upperRight;
+    public Vector2d getDrawingUpperRight(){
+        return mapBoundary.getRightUpperCorner();
     }
+
     private Vector2d getRandomPosition(){
         int x = (int) (Math.random() * Math.sqrt(10 * num_of_grasses));
         int y = (int) (Math.random() * Math.sqrt(10 * num_of_grasses));
         return new Vector2d(x,y);
     }
     private void addGrass(){
-        Vector2d pos;
+        Vector2d position;
         do {
-            pos = getRandomPosition();
-        }while (isOccupied(pos));
-        mapElements.put(pos, new Grass(pos));
+            position = getRandomPosition();
+        }while (isOccupied(position));
+        mapElements.put(position, new Grass(position));
+        mapBoundary.addNewMapElement(position);
     }
     private void eatGrass(Vector2d position){
         mapElements.remove(position);
+        mapBoundary.removeMapElement(position);
         addGrass();
     }
     @Override
