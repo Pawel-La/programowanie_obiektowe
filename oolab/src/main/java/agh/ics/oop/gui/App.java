@@ -19,7 +19,10 @@ public class App extends Application implements IPositionChangeObserver{
     private Vector2d lowerLeft, upperRight;
     private final GridPane gridPane = new GridPane();
     private Vector2d[] positions;
+    private IBehaviorVariant behaviorVariant;
     int moveDelay;
+    int energy;
+    int number_of_genomes;
     protected Map<Vector2d, IMapElement> animals = new HashMap<>();
 
     private void reset(){
@@ -77,7 +80,7 @@ public class App extends Application implements IPositionChangeObserver{
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     }
-                    gridPane.add(guiElementBox.vBox, i1, j, 1, 1);
+                    gridPane.add(guiElementBox.getVBox(), i1, j, 1, 1);
                 }
             }
         }));
@@ -86,9 +89,14 @@ public class App extends Application implements IPositionChangeObserver{
 
     @Override
     public void init() {
-        this.positions = new Vector2d[]{new Vector2d(2, 2), new Vector2d(3, 4),
-        new Vector2d(6,5), new Vector2d(2,5)};
+//        this.positions = new Vector2d[]{new Vector2d(2, 2), new Vector2d(3, 4),
+//        new Vector2d(6,5), new Vector2d(2,5)};
+        this.positions = new Vector2d[]{new Vector2d(2, 2), new Vector2d(2,3),
+        new Vector2d(3,2), new Vector2d(3,3)};
         moveDelay = 300;
+        energy = 10;
+        number_of_genomes = 5;
+        behaviorVariant = new CompletePredestination();
     }
 
     @Override
@@ -103,9 +111,9 @@ public class App extends Application implements IPositionChangeObserver{
 
         button.setOnAction(value ->  {
             map = new GrassField(10);
-            SimulationEngine engine = new SimulationEngine(map, positions, this, moveDelay);
+            SimulationEngine engine = new SimulationEngine(
+                    map, positions, this, moveDelay, energy, number_of_genomes, behaviorVariant);
             Thread engineThread = new Thread(engine);
-            engine.setDirections(new OptionsParser().parse(textField.getText().split(" ")));
             engineThread.start();
         });
         primaryStage.setScene(scene);

@@ -15,7 +15,6 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
     public Vector2d getDrawingUpperRight(){
         return mapBoundary.getRightUpperCorner();
     }
-
     private Vector2d getRandomPosition(){
         int x = (int) (Math.random() * Math.sqrt(10 * num_of_grasses));
         int y = (int) (Math.random() * Math.sqrt(10 * num_of_grasses));
