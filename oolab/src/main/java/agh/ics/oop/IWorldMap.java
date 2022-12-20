@@ -9,15 +9,6 @@ package agh.ics.oop;
  */
 public interface IWorldMap {
     /**
-     * Indicate if any object can move to the given position.
-     *
-     * @param position
-     *            The position checked for the movement possibility.
-     * @return True if the object can move to that position.
-     */
-    boolean canMoveTo(Vector2d position);
-
-    /**
      * Place a animal on the map.
      *
      * @param animal
@@ -45,4 +36,8 @@ public interface IWorldMap {
      * @return Object or null if the position is not occupied.
      */
     Object objectAt(Vector2d position);
+    void eatGrass(Animal animal, Vector2d position);
+    Vector2d getRandomPosition();
+    void edgeService(Animal animal);
+    boolean inBounds(Vector2d position);
 }

@@ -7,23 +7,45 @@ import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
 
-public class App extends Application implements IPositionChangeObserver{
+public class App extends Application{
     private GrassField map;
-    private Vector2d lowerLeft, upperRight;
-    private final GridPane gridPane = new GridPane();
-    private Vector2d[] positions;
+    private int mapWidth;
+    private int mapHeight;
+    //    number of grasses at the beginning of simulation
+    private int initNumberOfGrasses;
+    //    energy that single grass gives
+    private int grassEnergy;
+    //    number of grasses that raise daily
+    private int grassesDaily;
+    private IGrassVariant grassVariant;
+    //    number of animals at the beginning of simulation
+    private int initNumberOfAnimals;
+    //    energy of an animal at the start of simulation
+    private int animalEnergy;
+    //    energy that animal need to be able to reproduce
+    private int fedEnergy;
+    //    energy that animals spend to bore a child,
+    //    also the initial energy of a child
+    private int childEnergy;
+    //    minimal number of mutations to child's genomes
+    private int minMutations;
+    //    maximal number of mutations to child's genomes
+    private int maxMutations;
+    private IMutationVariant mutationVariant;
+    //    length of animals' genome
+    private int numberOfGenes;
+    private IMapVariant mapVariant;
+    //    animals behaviour variant
     private IBehaviorVariant behaviorVariant;
-    int moveDelay;
-    int energy;
-    int number_of_genomes;
-    protected Map<Vector2d, IMapElement> animals = new HashMap<>();
+    //   some other app's parameters
+    private final GridPane gridPane = new GridPane();
+    private int moveDelay;
+    private Vector2d lowerLeft;
+    private Vector2d upperRight;
 
     private void reset(){
         gridPane.setGridLinesVisible(false);
@@ -89,45 +111,43 @@ public class App extends Application implements IPositionChangeObserver{
 
     @Override
     public void init() {
-//        this.positions = new Vector2d[]{new Vector2d(2, 2), new Vector2d(3, 4),
-//        new Vector2d(6,5), new Vector2d(2,5)};
-        this.positions = new Vector2d[]{new Vector2d(2, 2), new Vector2d(2,3),
-        new Vector2d(3,2), new Vector2d(3,3)};
-        moveDelay = 300;
-        energy = 10;
-        number_of_genomes = 5;
+        mapWidth = 4;
+        mapHeight = 4;
+        initNumberOfGrasses = 10;
+        grassEnergy = 5;
+//        grassesDaily = 5;
+//        grassVariant =;
+        initNumberOfAnimals = 5;
+        animalEnergy = 10;
+//        fedEnergy = 10;
+        childEnergy = 12;
+//        minMutations = 0;
+//        maxMutations = 10;
+//        mutationVariant = ;
+        numberOfGenes = 5;
+        mapVariant = new Globe(mapWidth, mapHeight);
         behaviorVariant = new CompletePredestination();
+        moveDelay = 300;
     }
 
     @Override
     public void start(Stage primaryStage){
 
         Button button = new Button("Start");
-        TextField textField = new TextField();
-        HBox hBox = new HBox(button, textField);
+        HBox hBox = new HBox(button);
         VBox vBox = new VBox(hBox, gridPane);
 
         Scene scene = new Scene(vBox, 500, 500);
 
         button.setOnAction(value ->  {
-            map = new GrassField(10);
+            map = new GrassField(mapVariant, initNumberOfGrasses, grassEnergy, mapWidth, mapHeight);
             SimulationEngine engine = new SimulationEngine(
-                    map, positions, this, moveDelay, energy, number_of_genomes, behaviorVariant);
+                    map, initNumberOfAnimals, this,
+                    moveDelay, animalEnergy, numberOfGenes, behaviorVariant);
             Thread engineThread = new Thread(engine);
             engineThread.start();
         });
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-
-    @Override
-    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
-        IMapElement animal = animals.get(oldPosition);
-        animals.remove(oldPosition);
-        animals.put(newPosition, animal);
-    }
-
-    public void addNewAnimal(IMapElement mapElement){
-        animals.put(mapElement.getPosition(), mapElement);
     }
 }

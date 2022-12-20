@@ -9,36 +9,35 @@ public class Animal implements IMapElement {
     private MapDirection orientation = MapDirection.NORTH;
     private Vector2d position;
     private final IWorldMap map;
-    private final int number_of_genomes;
-    private int activeGenome;
-    private final int [] genomes;
+    private final int numberOfGenes;
+    private int activeGene;
+    private final int [] genes;
     private IBehaviorVariant behaviorVariant;
     private int energy;
-    private int eatenPlants;
+    private int eatenGrasses;
     private int children;
     private int liveTime;
 
 //    first animals constructor
     public Animal(IWorldMap map,
-                  Vector2d initialPosition,
                   int energy,
-                  int number_of_genomes,
+                  int numberOfGenes,
                   IBehaviorVariant behaviorVariant){
         this.map = map;
-        this.position = initialPosition;
         this.energy = energy;
-        this.number_of_genomes = number_of_genomes;
+        this.numberOfGenes = numberOfGenes;
         this.behaviorVariant = behaviorVariant;
+        position = map.getRandomPosition();
         orientation = orientation.randomMapDirection();
-        eatenPlants = 0;
+        eatenGrasses = 0;
         children = 0;
         liveTime = 0;
 
-        genomes = new int[number_of_genomes];
-        for (int i = 0; i < number_of_genomes; i++)
-            genomes[i] = rand.nextInt(8);
+        genes = new int[numberOfGenes];
+        for (int i = 0; i < numberOfGenes; i++)
+            genes[i] = rand.nextInt(8);
 
-        activeGenome = rand.nextInt(number_of_genomes);
+        activeGene = rand.nextInt(numberOfGenes);
     }
     @Override
     public String toString(){
@@ -61,6 +60,9 @@ public class Animal implements IMapElement {
     public Vector2d getPosition(){
         return position;
     }
+    public void setPosition(Vector2d position) {
+        this.position = position;
+    }
 
     @Override
     public String getMapElementLookFile() {
@@ -68,17 +70,13 @@ public class Animal implements IMapElement {
 //        return switch (this.orientation){
 //            case NORTH -> "src/main/resources/up.png";
 //            case SOUTH -> "src/main/resources/down.png";
-//            case WEST -> "src/main/resources/left.png";
-//            case EAST -> "src/main/resources/right.png";
-//            case NORTH_EAST -> "src/main/resources/up.png";
-//            case SOUTH_EAST -> "src/main/resources/up.png";
-//            case SOUTH_WEST -> "src/main/resources/up.png";
-//            case NORTH_WEST -> "src/main/resources/up.png";
-//        };
     }
 
     public MapDirection getOrientation(){
         return orientation;
+    }
+    public void turnAround() {
+        orientation = orientation.turn(4);
     }
 
     public void move(){
@@ -87,16 +85,28 @@ public class Animal implements IMapElement {
         energy--;
         liveTime++;
 
-        Vector2d possible_position, old_position;
-        orientation = orientation.turn(genomes[activeGenome]);
-        activeGenome = behaviorVariant.updateActiveGenome(activeGenome, number_of_genomes);
+        Vector2d possiblePosition, oldPosition;
+        orientation = orientation.turn(genes[activeGene]);
+        activeGene = behaviorVariant.updateActiveGene(activeGene, numberOfGenes);
+        oldPosition = position;
+        possiblePosition = position.add(orientation.toUnitVector());
 
-        possible_position = position.add(orientation.toUnitVector());
-        if (map.canMoveTo(possible_position)) {
-            old_position = position;
-            position = possible_position;
-            positionChanged(old_position, possible_position);
+        if (map.inBounds(possiblePosition)){
+            position = possiblePosition;
         }
+        else {
+            map.edgeService(this);
+        }
+        positionChanged(oldPosition, position);
+    }
+    public void addEnergy(int x){
+        energy += x;
+    }
+    public void lowerEnergy(int x){
+        energy -= x;
+    }
+    public void addGrassesEaten(){
+        eatenGrasses++;
     }
     public void addObserver(IPositionChangeObserver observer){
         observers.add(observer);
@@ -106,7 +116,7 @@ public class Animal implements IMapElement {
     }
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition){
         for(IPositionChangeObserver observer : observers){
-            observer.positionChanged(oldPosition, newPosition);
+            observer.positionChanged(this, oldPosition, newPosition);
         }
     }
 }

@@ -11,19 +11,17 @@ public class SimulationEngine implements IEngine, Runnable{
 
     public SimulationEngine (
             IWorldMap map,
-            Vector2d [] positions,
+            int initNumberOfAnimals,
             App app,
             int moveDelay,
             int energy,
-            int number_of_genomes,
+            int numberOfGenes,
             IBehaviorVariant behaviorVariant){
         this.moveDelay = moveDelay;
         this.app = app;
-        for (Vector2d position: positions){
-            Animal animal = new Animal(map, position, energy, number_of_genomes, behaviorVariant);
+        for (int i = 0; i < initNumberOfAnimals; i++){
+            Animal animal = new Animal(map, energy, numberOfGenes, behaviorVariant);
             map.place(animal);
-            animal.addObserver(app);
-            app.addNewAnimal(animal);
             animals.add(animal);
         }
     }

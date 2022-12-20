@@ -4,10 +4,16 @@ import java.util.Random;
 
 public class LittleBitOfCrazyness implements IBehaviorVariant{
     @Override
-    public int updateActiveGenome(int activeGenome, int number_of_genomes) {
+    public int updateActiveGene(int activeGene, int numberOfGenes) {
         Random rand = new Random();
-        if (rand.nextInt(5) == 0)
-            return (activeGenome + 1) % number_of_genomes;
-        return rand.nextInt(number_of_genomes);
+//        20% chance for random genome
+        if (rand.nextInt(5) == 0){
+            int updatedGene = activeGene;
+            while (updatedGene == activeGene)
+                updatedGene = rand.nextInt(numberOfGenes);
+            return updatedGene;
+        }
+
+        return (activeGene + 1) % numberOfGenes;
     }
 }
