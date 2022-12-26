@@ -111,20 +111,20 @@ public class App extends Application{
 
     @Override
     public void init() {
-        mapWidth = 4;
-        mapHeight = 4;
+        mapWidth = 5;
+        mapHeight = 5;
         initNumberOfGrasses = 10;
         grassEnergy = 5;
 //        grassesDaily = 5;
 //        grassVariant =;
-        initNumberOfAnimals = 5;
+        initNumberOfAnimals = 7;
         animalEnergy = 10;
-//        fedEnergy = 10;
-        childEnergy = 12;
-//        minMutations = 0;
-//        maxMutations = 10;
-//        mutationVariant = ;
-        numberOfGenes = 5;
+        fedEnergy = 6;
+        childEnergy = 8;
+        minMutations = 0;
+        maxMutations = 10;
+        mutationVariant = new CompletelyRandomMutation();
+        numberOfGenes = 10;
         mapVariant = new Globe(mapWidth, mapHeight);
         behaviorVariant = new CompletePredestination();
         moveDelay = 300;
@@ -140,7 +140,9 @@ public class App extends Application{
         Scene scene = new Scene(vBox, 500, 500);
 
         button.setOnAction(value ->  {
-            map = new GrassField(mapVariant, initNumberOfGrasses, grassEnergy, mapWidth, mapHeight);
+            map = new GrassField(mapVariant, initNumberOfGrasses,
+                    grassEnergy, mapWidth, mapHeight, childEnergy, fedEnergy,
+                    minMutations, maxMutations, mutationVariant, behaviorVariant);
             SimulationEngine engine = new SimulationEngine(
                     map, initNumberOfAnimals, this,
                     moveDelay, animalEnergy, numberOfGenes, behaviorVariant);

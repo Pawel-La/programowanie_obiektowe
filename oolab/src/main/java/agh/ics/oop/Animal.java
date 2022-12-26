@@ -16,9 +16,9 @@ public class Animal implements IMapElement {
     private int energy;
     private int eatenGrasses;
     private int children;
-    private int liveTime;
+    private int age;
 
-//    first animals constructor
+//    added (not born) animals constructor
     public Animal(IWorldMap map,
                   int energy,
                   int numberOfGenes,
@@ -31,11 +31,31 @@ public class Animal implements IMapElement {
         orientation = orientation.randomMapDirection();
         eatenGrasses = 0;
         children = 0;
-        liveTime = 0;
+        age = 0;
 
         genes = new int[numberOfGenes];
         for (int i = 0; i < numberOfGenes; i++)
             genes[i] = rand.nextInt(8);
+
+        activeGene = rand.nextInt(numberOfGenes);
+    }
+//    born animals constructor
+    public Animal(IWorldMap map,
+                  int energy,
+                  int numberOfGenes,
+                  IBehaviorVariant behaviorVariant,
+                  Vector2d position,
+                  int [] genes){
+        this.map = map;
+        this.energy = energy;
+        this.numberOfGenes = numberOfGenes;
+        this.behaviorVariant = behaviorVariant;
+        this.position = position;
+        this.genes = genes;
+        orientation = orientation.randomMapDirection();
+        eatenGrasses = 0;
+        children = 0;
+        age = 0;
 
         activeGene = rand.nextInt(numberOfGenes);
     }
@@ -80,10 +100,12 @@ public class Animal implements IMapElement {
     }
 
     public void move(){
-        if (energy <= 0)
-            throw new RuntimeException("animal can't move, it is dead");
+        if (energy <= 0){
+            throw new RuntimeException("Animal is dead");
+        }
+
         energy--;
-        liveTime++;
+        age++;
 
         Vector2d possiblePosition, oldPosition;
         orientation = orientation.turn(genes[activeGene]);
@@ -98,6 +120,24 @@ public class Animal implements IMapElement {
             map.edgeService(this);
         }
         positionChanged(oldPosition, position);
+    }
+    public boolean dead(){
+        return energy <= 0;
+    }
+    public int[] getGenes() {
+        return genes;
+    }
+    public int getAge() {
+        return age;
+    }
+    public int getChildren() {
+        return children;
+    }
+    public void addChildren(){
+        children += 1;
+    }
+    public int getEnergy() {
+        return energy;
     }
     public void addEnergy(int x){
         energy += x;

@@ -1,19 +1,35 @@
 package agh.ics.oop;
 
-import java.util.Random;
+import java.util.*;
+import static java.lang.Math.round;
 
 public class GrassField extends AbstractWorldMap implements IWorldMap{
     private final int grassEnergy;
     private final Random random = new Random();
     private final int mapWidth;
     private final int mapHeight;
+    private final int childEnergy;
+    private final int fedEnergy;
+    private final int minMutations;
+    private final int maxMutations;
+    private final IMutationVariant mutationVariant;
+    private final IBehaviorVariant behaviorVariant;
     private final IMapVariant mapVariant;
     public GrassField(IMapVariant mapVariant, int numOfGrasses,
-                      int grassEnergy, int mapWidth, int mapHeight){
+                      int grassEnergy, int mapWidth, int mapHeight,
+                      int childEnergy, int fedEnergy, int minMutations,
+                      int maxMutations, IMutationVariant mutationVariant,
+                      IBehaviorVariant behaviorVariant){
         this.mapVariant = mapVariant;
         this.grassEnergy = grassEnergy;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
+        this.childEnergy = childEnergy;
+        this.fedEnergy = fedEnergy;
+        this.minMutations = minMutations;
+        this.maxMutations = maxMutations;
+        this.mutationVariant = mutationVariant;
+        this.behaviorVariant = behaviorVariant;
         for (int i = 0; i < numOfGrasses; i++)
             addGrass();
         leftLowerCorner = new Vector2d(0,0);
@@ -35,15 +51,7 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
         do {
             position = getRandomPosition();
         }while (isOccupied(position));
-        grasses.put(position, new Grass(position, grassEnergy));
-    }
-
-    public void eatGrass(Animal animal, Vector2d position){
-        Grass grass = grasses.get(position);
-        animal.addEnergy(grass.getEnergy());
-        animal.addGrassesEaten();
-        grasses.remove(position);
-        addGrass();
+        grasses.put(position, new Grass(position));
     }
     public void edgeService(Animal animal){
         Vector2d position = animal.getPosition().add(animal.getOrientation().toUnitVector());
@@ -55,5 +63,94 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
     public boolean inBounds(Vector2d position){
         return position.follows(leftLowerCorner) &&
                 position.precedes(rightUpperCorner);
+    }
+    private Comparator<Animal> animalComparator(){
+        Comparator<Animal> compareByEnergy =
+                Comparator.comparing(Animal::getEnergy, Comparator.reverseOrder());
+        Comparator<Animal> compareByAge =
+                Comparator.comparing(Animal::getAge, Comparator.reverseOrder());
+        Comparator<Animal> compareByNumOfKids =
+                Comparator.comparing(Animal::getChildren, Comparator.reverseOrder());
+        return compareByEnergy
+                .thenComparing(compareByAge)
+                .thenComparing(compareByNumOfKids);
+    }
+    public void eatGrass(Animal animal, Vector2d position){
+        animal.addEnergy(grassEnergy);
+        animal.addGrassesEaten();
+        grasses.remove(position);
+    }
+    private int [] mutateGenes(int [] genes){
+        int numberOfMutations = random.nextInt(maxMutations - minMutations) + minMutations;
+        List<Integer> pool = new ArrayList<>();
+        int [] copy = genes.clone();
+        for (int i = 0; i < genes.length; i++)
+            pool.add(i);
+        Collections.shuffle(pool);
+        for (int i = 0; i < numberOfMutations; i++)
+            copy[pool.get(i)] = mutationVariant.getMutatedGene(copy[pool.get(i)]);
+        return copy;
+    }
+    private Animal reproduce(Animal animal1, Animal animal2){
+        int animal1Energy = animal1.getEnergy();
+        int animal2Energy = animal2.getEnergy();
+//        we know that first animal energy is higher or the same as second animal's energy
+//        ,so we check only second animal energy level
+        if (animal2Energy < fedEnergy)
+            return null;
+
+        int numberOfAnimal1Genes, numberOfAnimal2Genes;
+        int [] animal1Genes = animal1.getGenes();
+        int [] animal2Genes = animal2.getGenes();
+        int numberOfGenes = animal1Genes.length;
+        int [] newGenes = new int[numberOfGenes];
+        double d;
+
+//        parents losing some energy for child
+        animal1.lowerEnergy(childEnergy / 2);
+        animal2.lowerEnergy(childEnergy - (childEnergy / 2));
+        animal1.addChildren();
+        animal2.addChildren();
+//        calculating how many genes will be from 1st and 2nd animal
+        d = (animal1Energy * numberOfGenes)/ (double) (animal1Energy + animal2Energy);
+        numberOfAnimal1Genes = (int) round(d);
+        numberOfAnimal2Genes = numberOfGenes - numberOfAnimal1Genes;
+//        stronger animal gives genes from the front
+        if (random.nextInt(2) == 0){
+            System.arraycopy(animal1Genes, 0, newGenes, 0, numberOfAnimal1Genes);
+            System.arraycopy(animal2Genes, numberOfAnimal1Genes, newGenes, numberOfAnimal1Genes,
+                    numberOfGenes - numberOfAnimal1Genes);
+        }
+        //        stronger animal gives genes from the back
+        else {
+            System.arraycopy(animal2Genes, 0, newGenes, 0, numberOfAnimal2Genes);
+            System.arraycopy(animal1Genes, numberOfAnimal2Genes, newGenes, numberOfAnimal2Genes,
+                    numberOfGenes - numberOfAnimal2Genes);
+        }
+        newGenes = mutateGenes(newGenes);
+        return new Animal(this, childEnergy, numberOfGenes,
+                behaviorVariant, animal1.getPosition(), newGenes);
+    }
+    @Override
+    public List<Animal> fightEatReproduce(){
+        List<Animal> newAnimals = new ArrayList<>();
+        for (Vector2d position: animals.keySet()){
+            List<Animal> animalList = animals.get(position);
+            Comparator<Animal> compareAnimals = animalComparator();
+            animalList.sort(compareAnimals);
+            Animal animal1 = animalList.get(0);
+            if (grasses.get(position) != null){
+                eatGrass(animal1, position);
+            }
+            if (animalList.size() >= 2){
+                Animal animal2 = animalList.get(1);
+                Animal newAnimal = reproduce(animal1, animal2);
+                if (newAnimal != null){
+                    place(newAnimal);
+                    newAnimals.add(newAnimal);
+                }
+            }
+        }
+        return newAnimals;
     }
 }

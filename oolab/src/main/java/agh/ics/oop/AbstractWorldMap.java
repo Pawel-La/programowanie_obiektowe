@@ -1,11 +1,8 @@
 package agh.ics.oop;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
+abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver{
     protected Map<Vector2d, List<Animal>> animals = new HashMap<>();
     protected Map<Vector2d, Grass> grasses = new HashMap<>();
     protected Vector2d leftLowerCorner;
@@ -34,21 +31,25 @@ abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
         if (animals.get(position) == null || animals.get(position).size() == 0){
             return grasses.get(position);
         }
-        System.out.println("length: "+ animals.get(position).size());
         return (animals.get(position)).get(0);
     }
     @Override
     public void positionChanged(Animal animal, Vector2d oldPosition, Vector2d newPosition) {
-        if (animals.get(oldPosition) == null)
-            throw new RuntimeException("cos poszlo nie tak w position changed");
+        clearAnimal(animal, oldPosition);
+        animals.computeIfAbsent(newPosition, k -> new ArrayList<>()).add(animal);
+    }
+    @Override
+    public void clearAnimal(Animal animal, Vector2d position){
         Animal found = null;
-        for(Animal animal1: animals.get(oldPosition)){
+        for(Animal animal1: animals.get(position)){
             if(animal1.equals(animal)){
                 found = animal1;
                 break;
             }
         }
-        animals.get(oldPosition).remove(found);
-        animals.computeIfAbsent(newPosition, k -> new ArrayList<>()).add(animal);
+        animals.get(position).remove(found);
+        if (animals.get(position).isEmpty()) {
+            animals.remove(position);
+        }
     }
 }
