@@ -13,9 +13,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class GuiElementBox {
-    private VBox vBox;
-    private void setVBox(IMapElement mapElement, String fileName) throws FileNotFoundException {
-        Image image = new Image(new FileInputStream(fileName));
+    private final VBox vBox;
+
+    public VBox getVBox(){
+        return vBox;
+    }
+
+    GuiElementBox(IMapElement mapElement) throws FileNotFoundException {
+        Image image = new Image(new FileInputStream(mapElement.getMapElementLookFile()),
+                20 , 20, false, false);
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(20);
         imageView.setFitHeight(20);
@@ -27,14 +33,6 @@ public class GuiElementBox {
             label.setText(mapElement.toString());
         vBox = new VBox(imageView, label);
         vBox.setAlignment(Pos.CENTER);
-    }
-
-    public VBox getVBox(){
-        return vBox;
-    }
-
-    GuiElementBox(IMapElement mapElement) throws FileNotFoundException {
-        setVBox(mapElement, mapElement.getMapElementLookFile());
     }
 
 }

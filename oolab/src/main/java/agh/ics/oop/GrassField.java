@@ -5,6 +5,7 @@ import static java.lang.Math.round;
 
 public class GrassField extends AbstractWorldMap implements IWorldMap{
     private final int grassEnergy;
+    private final int grassesDaily;
     private final Random random = new Random();
     private final int mapWidth;
     private final int mapHeight;
@@ -15,11 +16,12 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
     private final IMutationVariant mutationVariant;
     private final IBehaviorVariant behaviorVariant;
     private final IMapVariant mapVariant;
+    private final IGrassVariant grassVariant;
     public GrassField(IMapVariant mapVariant, int numOfGrasses,
-                      int grassEnergy, int mapWidth, int mapHeight,
+                      int grassEnergy, int grassesDaily, int mapWidth, int mapHeight,
                       int childEnergy, int fedEnergy, int minMutations,
                       int maxMutations, IMutationVariant mutationVariant,
-                      IBehaviorVariant behaviorVariant){
+                      IBehaviorVariant behaviorVariant, IGrassVariant grassVariant){
         this.mapVariant = mapVariant;
         this.grassEnergy = grassEnergy;
         this.mapWidth = mapWidth;
@@ -30,10 +32,15 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
         this.maxMutations = maxMutations;
         this.mutationVariant = mutationVariant;
         this.behaviorVariant = behaviorVariant;
-        for (int i = 0; i < numOfGrasses; i++)
-            addGrass();
+        this.grassVariant = grassVariant;
+        this.grassesDaily = grassesDaily;
         leftLowerCorner = new Vector2d(0,0);
         rightUpperCorner = new Vector2d(mapWidth - 1, mapHeight - 1);
+
+        Set<Vector2d> newGrassesPositions = grassVariant.growGrass(numOfGrasses);
+        for (Vector2d newGrassPosition: newGrassesPositions){
+            grasses.put(newGrassPosition, new Grass(newGrassPosition));
+        }
     }
     public Vector2d getDrawingLowerLeft(){
         return leftLowerCorner;
@@ -45,13 +52,6 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
         int x = random.nextInt(mapWidth);
         int y = random.nextInt(mapHeight);
         return new Vector2d(x,y);
-    }
-    private void addGrass(){
-        Vector2d position;
-        do {
-            position = getRandomPosition();
-        }while (isOccupied(position));
-        grasses.put(position, new Grass(position));
     }
     public void edgeService(Animal animal){
         Vector2d position = animal.getPosition().add(animal.getOrientation().toUnitVector());
@@ -79,6 +79,7 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
         animal.addEnergy(grassEnergy);
         animal.addGrassesEaten();
         grasses.remove(position);
+        grassVariant.grassNoMoreAt(position);
     }
     private int [] mutateGenes(int [] genes){
         int numberOfMutations = random.nextInt(maxMutations - minMutations) + minMutations;
@@ -152,5 +153,27 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
             }
         }
         return newAnimals;
+    }
+    @Override
+    public void growGrass(){
+        Set<Vector2d> newGrassesPositions = grassVariant.growGrass(grassesDaily);
+        for (Vector2d newGrassPosition: newGrassesPositions){
+            grasses.put(newGrassPosition, new Grass(newGrassPosition));
+        }
+    }
+    @Override
+    public int getNumOfFreeSpots(){
+        int count = 0;
+        for (int i = 0; i < mapWidth; i++){
+            for (int j = 0; j < mapHeight; j++){
+                if (!isOccupied(new Vector2d(i,j)))
+                    count++;
+            }
+        }
+        return count;
+    }
+    @Override
+    public int getNumOfGrasses(){
+        return grasses.size();
     }
 }

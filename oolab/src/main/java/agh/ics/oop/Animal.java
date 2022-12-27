@@ -86,10 +86,13 @@ public class Animal implements IMapElement {
 
     @Override
     public String getMapElementLookFile() {
-        return "src/main/resources/up.png";
-//        return switch (this.orientation){
-//            case NORTH -> "src/main/resources/up.png";
-//            case SOUTH -> "src/main/resources/down.png";
+        if (this.energy >= 15){
+            return "src/main/resources/highHp.png";
+        }
+        else if (this.energy >= 7){
+            return "src/main/resources/mediumHp.png";
+        }
+        return "src/main/resources/lowHp.png";
     }
 
     public MapDirection getOrientation(){

@@ -1,0 +1,17 @@
+mapWidth 7
+mapHeight 7
+initNumberOfGrasses 5
+grassEnergy 5
+grassesDaily 1
+grassVariant WoodedEquators
+initNumberOfAnimals 10
+animalEnergy 50
+fedEnergy 6
+childEnergy 8
+minMutations 0
+maxMutations 5
+mutationVariant CompletelyRandomMutation
+numberOfGenes 5
+mapVariant Globe
+behaviorVariant CompletePredestination
+moveDelay 300

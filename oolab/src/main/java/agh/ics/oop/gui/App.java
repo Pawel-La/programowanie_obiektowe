@@ -9,7 +9,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
+import javax.swing.*;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 public class App extends Application{
     private GrassField map;
@@ -108,48 +115,200 @@ public class App extends Application{
         }));
         mapThread.start();
     }
-
-    @Override
-    public void init() {
-        mapWidth = 5;
-        mapHeight = 5;
-        initNumberOfGrasses = 10;
+    private void setDefaultConfigs(){
+        mapWidth = 7;
+        mapHeight = 7;
+        initNumberOfGrasses = 5;
         grassEnergy = 5;
-//        grassesDaily = 5;
-//        grassVariant =;
-        initNumberOfAnimals = 7;
-        animalEnergy = 10;
+        grassesDaily = 1;
+        grassVariant = new WoodedEquators(mapWidth, mapHeight, grassesDaily);
+        initNumberOfAnimals = 10;
+        animalEnergy = 50;
         fedEnergy = 6;
         childEnergy = 8;
         minMutations = 0;
         maxMutations = 10;
         mutationVariant = new CompletelyRandomMutation();
-        numberOfGenes = 10;
+        numberOfGenes = 3;
         mapVariant = new Globe(mapWidth, mapHeight);
         behaviorVariant = new CompletePredestination();
         moveDelay = 300;
     }
+    private void setConfigs(String configPath) throws FileNotFoundException {
+        Map<String, String> configs = new HashMap<>();
+        File config = new File(configPath);
+        Scanner scanner = new Scanner(config);
+        while(scanner.hasNextLine()){
+            String line = scanner.nextLine();
+            String [] words = line.split(" ", 2);
+            if (words.length < 2)
+                throw new RuntimeException("Bledny plik konfiguracyjny!");
+            configs.computeIfAbsent(words[0], k -> words[1]);
+        }
+        try {
+            if (configs.get("mapWidth") != null)
+                mapWidth = Integer.parseInt(configs.get("mapWidth"));
+            if (configs.get("mapHeight") != null)
+                mapHeight = Integer.parseInt(configs.get("mapHeight"));
+            if (configs.get("initNumberOfGrasses") != null)
+                initNumberOfGrasses = Integer.parseInt(configs.get("initNumberOfGrasses"));
+            if (configs.get("grassEnergy") != null)
+                grassEnergy = Integer.parseInt(configs.get("grassEnergy"));
+            if (configs.get("grassesDaily") != null)
+                grassesDaily = Integer.parseInt(configs.get("grassesDaily"));
+            if (configs.get("initNumberOfAnimals") != null)
+                initNumberOfAnimals = Integer.parseInt(configs.get("initNumberOfAnimals"));
+            if (configs.get("animalEnergy") != null)
+                animalEnergy = Integer.parseInt(configs.get("animalEnergy"));
+            if (configs.get("fedEnergy") != null)
+                fedEnergy = Integer.parseInt(configs.get("fedEnergy"));
+            if (configs.get("childEnergy") != null)
+                childEnergy = Integer.parseInt(configs.get("childEnergy"));
+            if (configs.get("minMutations") != null)
+                minMutations = Integer.parseInt(configs.get("minMutations"));
+            if (configs.get("maxMutations") != null)
+                maxMutations = Integer.parseInt(configs.get("maxMutations"));
+            if (configs.get("numberOfGenes") != null)
+                numberOfGenes = Integer.parseInt(configs.get("numberOfGenes"));
+        }
+        catch (NumberFormatException ex){
+            ex.printStackTrace();
+        }
 
+        try{
+            switch (configs.get("grassVariant")){
+                case "WoodedEquators" -> grassVariant = new WoodedEquators(mapWidth, mapHeight, grassesDaily);
+            }
+            switch (configs.get("mutationVariant")){
+                case "MinorCorrectionMutation" -> mutationVariant = new MinorCorrectionMutation();
+                case "CompletelyRandomMutation" -> mutationVariant = new CompletelyRandomMutation();
+            }
+            switch (configs.get("mapVariant")){
+                case "Globe" -> mapVariant = new Globe(mapWidth, mapHeight);
+                case "HellPortal" -> mapVariant = new HellPortal(mapWidth, mapHeight, childEnergy);
+            }
+            switch (configs.get("behaviorVariant")){
+                case "CompletePredestination" -> behaviorVariant = new CompletePredestination();
+                case "LittleBitOfCraziness" -> behaviorVariant = new LittleBitOfCraziness();
+            }
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+        checkIfConfigsAreCorrect();
+    }
+    private void checkIfConfigsAreCorrect(){
+        if (mapWidth <= 0){
+            throw new RuntimeException("parametr mapWidth musi byc dodatni!");
+        }
+        if (mapHeight <= 0){
+            throw new RuntimeException("parametr mapHeight musi byc dodatni!");
+        }
+        if (initNumberOfGrasses < 0){
+            throw new RuntimeException("parametr initNumberOfGrasses nie moze byc ujemny!");
+        }
+        if (grassEnergy < 0){
+            throw new RuntimeException("parametr grassEnergy nie moze byc ujemny!");
+        }
+        if (grassesDaily < 0){
+            throw new RuntimeException("parametr grassesDaily nie moze byc ujemny!");
+        }
+        if (initNumberOfAnimals < 0){
+            throw new RuntimeException("parametr initNumberOfAnimals nie moze byc ujemny!");
+        }
+        if (animalEnergy < 0){
+            throw new RuntimeException("parametr animalEnergy nie moze byc ujemny!");
+        }
+        if (fedEnergy < 0){
+            throw new RuntimeException("parametr fedEnergy nie moze byc ujemny!");
+        }
+        if (childEnergy <= 0){
+            throw new RuntimeException("parametr childEnergy musi byc dodatni!");
+        }
+        if (minMutations < 0){
+            throw new RuntimeException("parametr minMutations nie moze byc ujemny!");
+        }
+        if (maxMutations < 0){
+            throw new RuntimeException("parametr maxMutations nie moze byc ujemny!");
+        }
+        if (numberOfGenes <= 0){
+            throw new RuntimeException("parametr numberOfGenes musi byc dodatni!");
+        }
+        if (mapWidth * mapHeight < initNumberOfGrasses){
+            throw new RuntimeException("powierzchnia mapy musi byc wieksza od poczatkowej liczby traw");
+        }
+        if (mapWidth * mapHeight < initNumberOfAnimals){
+            throw new RuntimeException("powierzchnia mapy musi byc wieksza od poczatkowej liczby zwierzat");
+        }
+        if (fedEnergy * 2 < childEnergy){
+            throw new RuntimeException("suma energii rodzicow przy reprodukcji " +
+                    "nie moze byc mniejsza od energii dziecka");
+        }
+        if (minMutations > maxMutations){
+            throw new RuntimeException("maksymalna liczba mutacji nie moze byc mniejsza od minimalnej liczby mutacji");
+        }
+        if (numberOfGenes < maxMutations){
+            throw new RuntimeException("maksymalna liczba mutacji nie moze byc wieksza od liczby genow zwierzecia");
+        }
+    }
+    @Override
+    public void init() {
+        setDefaultConfigs();
+    }
+    private void go(){
+        map = new GrassField(mapVariant, initNumberOfGrasses, grassEnergy, grassesDaily,
+                mapWidth, mapHeight, childEnergy, fedEnergy, minMutations,
+                maxMutations, mutationVariant, behaviorVariant, grassVariant);
+        SimulationEngine engine = new SimulationEngine(
+                map, initNumberOfAnimals, this,
+                moveDelay, animalEnergy, numberOfGenes, behaviorVariant);
+        Thread engineThread = new Thread(engine);
+        engineThread.start();
+    }
     @Override
     public void start(Stage primaryStage){
 
-        Button button = new Button("Start");
-        HBox hBox = new HBox(button);
+        Button button1 = new Button("Konfiguracja 1");
+        Button button2 = new Button("Konfiguracja 2");
+        Button button3 = new Button("Wlasny plik konfiguracyjny");
+        HBox hBox = new HBox(button1, button2, button3);
         VBox vBox = new VBox(hBox, gridPane);
 
         Scene scene = new Scene(vBox, 500, 500);
 
-        button.setOnAction(value ->  {
-            map = new GrassField(mapVariant, initNumberOfGrasses,
-                    grassEnergy, mapWidth, mapHeight, childEnergy, fedEnergy,
-                    minMutations, maxMutations, mutationVariant, behaviorVariant);
-            SimulationEngine engine = new SimulationEngine(
-                    map, initNumberOfAnimals, this,
-                    moveDelay, animalEnergy, numberOfGenes, behaviorVariant);
-            Thread engineThread = new Thread(engine);
-            engineThread.start();
+        maxMutations = Math.min(maxMutations, numberOfGenes);
+
+        button1.setOnAction(value ->  {
+            try {
+                setConfigs("src/main/resources/config1.txt");
+                go();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         });
+
+        button2.setOnAction(value ->  {
+            try {
+                setConfigs("src/main/resources/config2.txt");
+                go();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        button3.setOnAction(value ->  {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.showOpenDialog(null);
+            try {
+                setConfigs(fileChooser.getSelectedFile().getAbsolutePath());
+                go();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         primaryStage.setScene(scene);
         primaryStage.show();
+
     }
 }

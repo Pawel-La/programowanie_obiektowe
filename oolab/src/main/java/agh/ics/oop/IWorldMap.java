@@ -44,4 +44,9 @@ public interface IWorldMap {
     boolean inBounds(Vector2d position);
     void clearAnimal(Animal animal, Vector2d position);
     List<Animal> fightEatReproduce();
+    void growGrass();
+
+    int getNumOfFreeSpots();
+
+    int getNumOfGrasses();
 }

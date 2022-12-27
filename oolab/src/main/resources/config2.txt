@@ -1,0 +1,17 @@
+mapWidth 15
+mapHeight 15
+initNumberOfGrasses 25
+grassEnergy 10
+grassesDaily 5
+grassVariant WoodedEquators
+initNumberOfAnimals 10
+animalEnergy 50
+fedEnergy 10
+childEnergy 8
+minMutations 0
+maxMutations 5
+mutationVariant MinorCorrectionMutation
+numberOfGenes 10
+mapVariant HellPortal
+behaviorVariant LittleBitOfCraziness
+moveDelay 300

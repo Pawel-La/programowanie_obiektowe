@@ -2,7 +2,7 @@ package agh.ics.oop;
 
 import java.util.Random;
 
-public class LittleBitOfCrazyness implements IBehaviorVariant{
+public class LittleBitOfCraziness implements IBehaviorVariant{
     @Override
     public int updateActiveGene(int activeGene, int numberOfGenes) {
         Random rand = new Random();

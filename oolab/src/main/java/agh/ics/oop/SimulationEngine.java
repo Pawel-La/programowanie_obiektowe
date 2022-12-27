@@ -1,15 +1,16 @@
 package agh.ics.oop;
 
 import agh.ics.oop.gui.App;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class SimulationEngine implements IEngine, Runnable{
     private final IWorldMap map;
     private final App app;
     private final int moveDelay;
     private final List<Animal> animals = new ArrayList<>();
+    int [] mostPopularGenes;
+    private int numOfDeadAnimals = 0;
+    private int totalAgeOfDeadAnimals = 0;
     public SimulationEngine (
             IWorldMap map,
             int initNumberOfAnimals,
@@ -38,22 +39,70 @@ public class SimulationEngine implements IEngine, Runnable{
             }
         }
     }
-    public void clearDeadAnimals(){
+    private void clearDeadAnimals(){
         List<Animal> found = new ArrayList<>();
         for(Animal animal : animals){
             if(animal.dead()){
+                numOfDeadAnimals++;
+                totalAgeOfDeadAnimals += animal.getAge();
                 found.add(animal);
                 map.clearAnimal(animal, animal.getPosition());
             }
         }
         animals.removeAll(found);
     }
+    private int getAnimalsTotalEnergy(){
+        int totalEnergy = 0;
+        for (Animal animal: animals){
+            totalEnergy += animal.getEnergy();
+        }
+        return totalEnergy;
+    }
+    private int [] getMostPopularGenes(){
+        int [] genes;
+        int [] mostPopularGenes = null;
+        int numOfMostPopularGenes = 0;
+        Map<int[], Integer> genomes = new HashMap<>();
 
+        for (Animal animal: animals){
+            genes = animal.getGenes();
+            if (genomes.get(genes) == null){
+                genomes.put(genes, 1);
+                if (numOfMostPopularGenes == 0){
+                    mostPopularGenes = genes;
+                    numOfMostPopularGenes = 1;
+                }
+            }
+            else {
+                genomes.put(genes, genomes.get(genes) + 1);
+                if (genomes.get(genes) > numOfMostPopularGenes){
+                    numOfMostPopularGenes = genomes.get(genes);
+                    mostPopularGenes = genes;
+                }
+            }
+        }
+
+        return mostPopularGenes;
+    }
+    private void getInfoAboutSituation(){
+        int numOfAnimals = animals.size();
+        int numOfGrasses = map.getNumOfGrasses();
+        int numOfFreeSpots = map.getNumOfFreeSpots();
+        mostPopularGenes = getMostPopularGenes();
+        int averageEnergyForLivingAnimals = (numOfAnimals != 0) ? (getAnimalsTotalEnergy() / numOfAnimals) : 0;
+        int averageAgeOfDeath = (numOfDeadAnimals != 0) ? (totalAgeOfDeadAnimals / numOfDeadAnimals) : 0;
+        System.out.println(numOfAnimals);
+        System.out.println(numOfGrasses);
+        System.out.println(numOfFreeSpots);
+        System.out.println(Arrays.toString(mostPopularGenes));
+        System.out.println(averageEnergyForLivingAnimals);
+        System.out.println(averageAgeOfDeath);
+    }
     @Override
     public void run() {
-        for (int day = 0; day < 15; day++) {
+        for (int day = 0; day < 150; day++) {
             System.out.println("day: "+ (day+1));
-            System.out.println("number of animals: "+animals.size());
+            getInfoAboutSituation();
             app.update();
             try{
                 Thread.sleep(moveDelay);
@@ -63,6 +112,7 @@ public class SimulationEngine implements IEngine, Runnable{
             clearDeadAnimals();
             moves();
             animals.addAll(map.fightEatReproduce());
+            map.growGrass();
         }
     }
 }
