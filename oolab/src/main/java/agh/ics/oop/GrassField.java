@@ -17,7 +17,7 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
     private final IBehaviorVariant behaviorVariant;
     private final IMapVariant mapVariant;
     private final IGrassVariant grassVariant;
-    public GrassField(IMapVariant mapVariant, int numOfGrasses,
+    public GrassField(IMapVariant mapVariant, int initNumOfGrasses,
                       int grassEnergy, int grassesDaily, int mapWidth, int mapHeight,
                       int childEnergy, int fedEnergy, int minMutations,
                       int maxMutations, IMutationVariant mutationVariant,
@@ -36,8 +36,9 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
         this.grassesDaily = grassesDaily;
         leftLowerCorner = new Vector2d(0,0);
         rightUpperCorner = new Vector2d(mapWidth - 1, mapHeight - 1);
+        System.out.println(grassVariant instanceof ToxicCorpses);
 
-        Set<Vector2d> newGrassesPositions = grassVariant.growGrass(numOfGrasses);
+        Set<Vector2d> newGrassesPositions = grassVariant.growGrass(initNumOfGrasses);
         for (Vector2d newGrassPosition: newGrassesPositions){
             grasses.put(newGrassPosition, new Grass(newGrassPosition));
         }
@@ -175,5 +176,22 @@ public class GrassField extends AbstractWorldMap implements IWorldMap{
     @Override
     public int getNumOfGrasses(){
         return grasses.size();
+    }
+    @Override
+    public void clearAnimal(Animal animal, Vector2d position){
+        if (animal.getEnergy() <= 0){
+            grassVariant.deadAnimalAt(position);
+        }
+        Animal found = null;
+        for(Animal animal1: animals.get(position)){
+            if(animal1.equals(animal)){
+                found = animal1;
+                break;
+            }
+        }
+        animals.get(position).remove(found);
+        if (animals.get(position).isEmpty()) {
+            animals.remove(position);
+        }
     }
 }

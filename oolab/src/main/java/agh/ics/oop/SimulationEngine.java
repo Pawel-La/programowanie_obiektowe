@@ -1,14 +1,16 @@
 package agh.ics.oop;
 
 import agh.ics.oop.gui.App;
+
+import java.io.FileNotFoundException;
 import java.util.*;
 
 public class SimulationEngine implements IEngine, Runnable{
+    private final ToFileWriter toFileWriter = new ToFileWriter();
     private final IWorldMap map;
     private final App app;
     private final int moveDelay;
     private final List<Animal> animals = new ArrayList<>();
-    int [] mostPopularGenes;
     private int numOfDeadAnimals = 0;
     private int totalAgeOfDeadAnimals = 0;
     public SimulationEngine (
@@ -26,6 +28,12 @@ public class SimulationEngine implements IEngine, Runnable{
             Animal animal = new Animal(map, energy, numberOfGenes, behaviorVariant);
             map.place(animal);
             animals.add(animal);
+        }
+        try {
+            toFileWriter.setTitles();
+        }
+        catch (FileNotFoundException e){
+            e.printStackTrace();
         }
     }
     private void moves(){
@@ -58,51 +66,60 @@ public class SimulationEngine implements IEngine, Runnable{
         }
         return totalEnergy;
     }
-    private int [] getMostPopularGenes(){
+    private String getMostPopularGenes(){
         int [] genes;
         int [] mostPopularGenes = null;
         int numOfMostPopularGenes = 0;
         Map<int[], Integer> genomes = new HashMap<>();
 
-        for (Animal animal: animals){
+        for (Animal animal: animals) {
             genes = animal.getGenes();
-            if (genomes.get(genes) == null){
+            if (genomes.get(genes) == null) {
                 genomes.put(genes, 1);
-                if (numOfMostPopularGenes == 0){
+                if (numOfMostPopularGenes == 0) {
                     mostPopularGenes = genes;
                     numOfMostPopularGenes = 1;
                 }
-            }
-            else {
+            } else {
                 genomes.put(genes, genomes.get(genes) + 1);
-                if (genomes.get(genes) > numOfMostPopularGenes){
+                if (genomes.get(genes) > numOfMostPopularGenes) {
                     numOfMostPopularGenes = genomes.get(genes);
                     mostPopularGenes = genes;
                 }
             }
         }
 
-        return mostPopularGenes;
+        if (mostPopularGenes == null)
+            return null;
+
+        String [] mostPopularGenesAsString = new String[mostPopularGenes.length];
+        for (int i = 0; i < mostPopularGenes.length; i++){
+            mostPopularGenesAsString[i] = Integer.toString(mostPopularGenes[i]);
+        }
+        return String.join("", mostPopularGenesAsString);
     }
-    private void getInfoAboutSituation(){
-        int numOfAnimals = animals.size();
-        int numOfGrasses = map.getNumOfGrasses();
-        int numOfFreeSpots = map.getNumOfFreeSpots();
-        mostPopularGenes = getMostPopularGenes();
-        int averageEnergyForLivingAnimals = (numOfAnimals != 0) ? (getAnimalsTotalEnergy() / numOfAnimals) : 0;
-        int averageAgeOfDeath = (numOfDeadAnimals != 0) ? (totalAgeOfDeadAnimals / numOfDeadAnimals) : 0;
-        System.out.println(numOfAnimals);
-        System.out.println(numOfGrasses);
-        System.out.println(numOfFreeSpots);
-        System.out.println(Arrays.toString(mostPopularGenes));
-        System.out.println(averageEnergyForLivingAnimals);
-        System.out.println(averageAgeOfDeath);
+    private void getDailyInfo(int day){
+        toFileWriter.setDay(day);
+        toFileWriter.setNumOfAnimals(animals.size());
+        toFileWriter.setNumOfGrasses(map.getNumOfGrasses());
+        toFileWriter.setNumOfFreeSpots(map.getNumOfFreeSpots());
+        toFileWriter.setMostPopularGenes(getMostPopularGenes());
+        toFileWriter.setAverageEnergyForLivingAnimals(
+                (animals.size() != 0) ? (getAnimalsTotalEnergy() / animals.size()) : 0);
+        toFileWriter.setAverageAgeOfDeath(
+                (numOfDeadAnimals != 0) ? (totalAgeOfDeadAnimals / numOfDeadAnimals) : 0);
     }
     @Override
-    public void run() {
+    public void run(){
         for (int day = 0; day < 150; day++) {
             System.out.println("day: "+ (day+1));
-            getInfoAboutSituation();
+            getDailyInfo(day+1);
+            try {
+                toFileWriter.saveDailyInfo();
+            }
+            catch (FileNotFoundException e){
+                e.printStackTrace();
+            }
             app.update();
             try{
                 Thread.sleep(moveDelay);

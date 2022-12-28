@@ -3,7 +3,7 @@ mapHeight 15
 initNumberOfGrasses 25
 grassEnergy 10
 grassesDaily 5
-grassVariant WoodedEquators
+grassVariant ToxicCorpses
 initNumberOfAnimals 10
 animalEnergy 50
 fedEnergy 10

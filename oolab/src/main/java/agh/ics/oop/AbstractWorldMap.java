@@ -38,18 +38,4 @@ abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver{
         clearAnimal(animal, oldPosition);
         animals.computeIfAbsent(newPosition, k -> new ArrayList<>()).add(animal);
     }
-    @Override
-    public void clearAnimal(Animal animal, Vector2d position){
-        Animal found = null;
-        for(Animal animal1: animals.get(position)){
-            if(animal1.equals(animal)){
-                found = animal1;
-                break;
-            }
-        }
-        animals.get(position).remove(found);
-        if (animals.get(position).isEmpty()) {
-            animals.remove(position);
-        }
-    }
 }

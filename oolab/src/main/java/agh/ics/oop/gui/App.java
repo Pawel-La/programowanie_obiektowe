@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -121,7 +120,7 @@ public class App extends Application{
         initNumberOfGrasses = 5;
         grassEnergy = 5;
         grassesDaily = 1;
-        grassVariant = new WoodedEquators(mapWidth, mapHeight, grassesDaily);
+        grassVariant = new WoodedEquators(mapWidth, mapHeight);
         initNumberOfAnimals = 10;
         animalEnergy = 50;
         fedEnergy = 6;
@@ -177,7 +176,8 @@ public class App extends Application{
 
         try{
             switch (configs.get("grassVariant")){
-                case "WoodedEquators" -> grassVariant = new WoodedEquators(mapWidth, mapHeight, grassesDaily);
+                case "WoodedEquators" -> grassVariant = new WoodedEquators(mapWidth, mapHeight);
+                case "ToxicCorpses" -> grassVariant = new ToxicCorpses(mapWidth, mapHeight);
             }
             switch (configs.get("mutationVariant")){
                 case "MinorCorrectionMutation" -> mutationVariant = new MinorCorrectionMutation();
