@@ -33,9 +33,18 @@ public class ToFileWriter {
         this.mostPopularGenes = mostPopularGenes;
     }
 
+    /**
+     * @param data - line of data to convert
+     * @return converted line of data as CSV
+     */
     private String convertToCSV(String[] data) {
         return String.join(",", data);
     }
+
+    /**
+     * saves information saved in dataLines to csv file
+     * @throws FileNotFoundException if csv file doesn't exist
+     */
     private void saveInfoToCSV() throws FileNotFoundException {
         File csvOutputFile = new File("src/main/resources/info.csv");
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
@@ -44,6 +53,11 @@ public class ToFileWriter {
                     .forEach(pw::println);
         }
     }
+
+    /**
+     * Sets titles of columns in csv file
+     * @throws FileNotFoundException if csv file doesn't exist
+     */
     public void setTitles() throws FileNotFoundException {
         dataLines.add(new String[]{
                 "DZIEN",
@@ -57,7 +71,10 @@ public class ToFileWriter {
         saveInfoToCSV();
     }
 
-
+    /**
+     * save daily info to a csv file
+     * @throws FileNotFoundException if csv file doesn't exist
+     */
     public void saveDailyInfo() throws FileNotFoundException {
         dataLines.add(new String[]
                 {

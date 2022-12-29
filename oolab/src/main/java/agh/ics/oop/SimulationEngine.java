@@ -1,6 +1,7 @@
 package agh.ics.oop;
 
 import agh.ics.oop.gui.App;
+import javafx.scene.layout.GridPane;
 
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -9,6 +10,7 @@ public class SimulationEngine implements IEngine, Runnable{
     private final ToFileWriter toFileWriter = new ToFileWriter();
     private final IWorldMap map;
     private final App app;
+    private final GridPane gridPane;
     private final int moveDelay;
     private final List<Animal> animals = new ArrayList<>();
     private int numOfDeadAnimals = 0;
@@ -17,6 +19,7 @@ public class SimulationEngine implements IEngine, Runnable{
             IWorldMap map,
             int initNumberOfAnimals,
             App app,
+            GridPane gridPane,
             int moveDelay,
             int energy,
             int numberOfGenes,
@@ -24,6 +27,7 @@ public class SimulationEngine implements IEngine, Runnable{
         this.map = map;
         this.moveDelay = moveDelay;
         this.app = app;
+        this.gridPane = gridPane;
         for (int i = 0; i < initNumberOfAnimals; i++){
             Animal animal = new Animal(map, energy, numberOfGenes, behaviorVariant);
             map.place(animal);
@@ -39,7 +43,7 @@ public class SimulationEngine implements IEngine, Runnable{
     private void moves(){
         for (Animal animal: animals) {
             animal.move();
-            app.update();
+            app.update(gridPane, map);
             try {
                 Thread.sleep(moveDelay);
             } catch (InterruptedException e) {
@@ -50,7 +54,7 @@ public class SimulationEngine implements IEngine, Runnable{
     private void clearDeadAnimals(){
         List<Animal> found = new ArrayList<>();
         for(Animal animal : animals){
-            if(animal.dead()){
+            if(animal.isDead()){
                 numOfDeadAnimals++;
                 totalAgeOfDeadAnimals += animal.getAge();
                 found.add(animal);
@@ -98,7 +102,7 @@ public class SimulationEngine implements IEngine, Runnable{
         }
         return String.join("", mostPopularGenesAsString);
     }
-    private void getDailyInfo(int day){
+    private void setDailyInfo(int day){
         toFileWriter.setDay(day);
         toFileWriter.setNumOfAnimals(animals.size());
         toFileWriter.setNumOfGrasses(map.getNumOfGrasses());
@@ -113,14 +117,14 @@ public class SimulationEngine implements IEngine, Runnable{
     public void run(){
         for (int day = 0; day < 150; day++) {
             System.out.println("day: "+ (day+1));
-            getDailyInfo(day+1);
+            setDailyInfo(day+1);
             try {
                 toFileWriter.saveDailyInfo();
             }
             catch (FileNotFoundException e){
                 e.printStackTrace();
             }
-            app.update();
+            app.update(gridPane, map);
             try{
                 Thread.sleep(moveDelay);
             }catch (InterruptedException e){

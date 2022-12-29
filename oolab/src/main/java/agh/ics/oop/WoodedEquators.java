@@ -3,7 +3,7 @@ package agh.ics.oop;
 import java.util.HashSet;
 import java.util.Set;
 
-public class WoodedEquators extends AbstractGrassVariant{
+public class WoodedEquators extends AbstractGrassVariant implements IGrassVariant{
     int mapWidth, mapHeight;
     int topBound, bottomBound;
     protected Set<Vector2d> freePreferredSpots = new HashSet<>();
@@ -28,14 +28,11 @@ public class WoodedEquators extends AbstractGrassVariant{
         if (bottomBound <= position.y && position.y <= topBound)
             freePreferredSpots.add(position);
         else
-            freeNotPreferredSpots.add(position);
+            freeNotPreferredSpots.add(position); 
     }
 
     @Override
     public Set<Vector2d> growGrass(int numberOfGrasses) {
         return super.growGrass(numberOfGrasses, freePreferredSpots, freeNotPreferredSpots);
     }
-
-    @Override
-    public void deadAnimalAt(Vector2d position) {}
 }

@@ -17,7 +17,7 @@ public class Grass implements IMapElement {
     }
 
     public String toString(){
-        return "TRAWA";
+        return "GRASS";
     }
 
 }

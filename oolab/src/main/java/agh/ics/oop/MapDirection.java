@@ -12,6 +12,9 @@ enum MapDirection {
     WEST,
     NORTH_WEST;
 
+    /**
+     * @return name of map direction as string
+     */
     @Override
     public String toString(){
         return switch (this) {
@@ -26,7 +29,12 @@ enum MapDirection {
         };
     }
 
-    private MapDirection fromInt(int x){
+    /**
+     * change int value into map direction
+     * @param x - integer number from range 0 -> 7
+     * @return map direction associated with given integer
+     */
+    private static MapDirection fromInt(int x){
         return switch (x) {
             case 0 -> NORTH;
             case 1 -> NORTH_EAST;
@@ -40,6 +48,10 @@ enum MapDirection {
         };
     }
 
+    /**
+     * Turns this map direction into integer value
+     * @return integer value associated with this map direction
+     */
     private int toInt(){
         return switch (this) {
             case NORTH      -> 0;
@@ -53,15 +65,25 @@ enum MapDirection {
         };
     }
 
+    /**
+     * @param x - integer from 0 -> 7
+     * @return 'opposite' to x integer from 0 -> 7
+     */
     public MapDirection turn(int x){
         return fromInt((toInt() + x) % 8);
     }
 
-    public MapDirection randomMapDirection(){
+    /**
+     * @return random map direction
+     */
+    public static MapDirection randomMapDirection(){
         Random rand = new Random();
         return fromInt(rand.nextInt(8));
     }
 
+    /**
+     * @return this map direction as a Vector2D
+     */
     public Vector2d toUnitVector(){
         return switch (this) {
             case NORTH      ->  new Vector2d(0,1);
