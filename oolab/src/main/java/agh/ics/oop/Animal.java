@@ -123,6 +123,9 @@ public class Animal implements IMapElement {
     public int[] getGenes() {
         return genes;
     }
+    public int getActiveGene() {
+        return activeGene;
+    }
     public int getAge() {
         return age;
     }

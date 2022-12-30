@@ -113,8 +113,18 @@ public class SimulationEngine implements IEngine, Runnable{
         toFileWriter.setAverageAgeOfDeath(
                 (numOfDeadAnimals != 0) ? (totalAgeOfDeadAnimals / numOfDeadAnimals) : 0);
     }
+    private void getInfoAboutAnimal(Animal animal){
+        System.out.println(Arrays.toString(animal.getGenes()));
+        System.out.println(animal.getActiveGene());
+        System.out.println(animal.getEnergy());
+        System.out.println(animal.getEatenGrasses());
+        System.out.println(animal.getChildren());
+        System.out.println(animal.getAge());
+        System.out.println(animal.isDead());
+    }
     @Override
     public void run(){
+        app.update(gridPane, map);
         for (int day = 0; day < 150; day++) {
             System.out.println("day: "+ (day+1));
             setDailyInfo(day+1);
@@ -124,7 +134,6 @@ public class SimulationEngine implements IEngine, Runnable{
             catch (FileNotFoundException e){
                 e.printStackTrace();
             }
-            app.update(gridPane, map);
             try{
                 Thread.sleep(moveDelay);
             }catch (InterruptedException e){

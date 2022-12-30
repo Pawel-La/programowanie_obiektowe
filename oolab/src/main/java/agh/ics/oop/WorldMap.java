@@ -31,7 +31,6 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     private final IGrassVariant grassVariant;
     private final Comparator<Animal> compareAnimals;
     /**
-     *
      * @param mapVariant - variant of map (edges service)
      * @param initNumOfGrasses - initial number of grasses
      * @param grassEnergy - number of energy that grass gives to animal that eats it
@@ -225,7 +224,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
      */
     private int [] mutateGenes(int [] genes){
 //        randomly chooses number of mutations from (minMutations, maxMutations)
-        int numberOfMutations = random.nextInt(maxMutations - minMutations) + minMutations;
+        int numberOfMutations = random.nextInt(maxMutations - minMutations + 1) + minMutations;
 //        creates pool that will contain indexes of genome possible (not mutated yet) to mutate
         List<Integer> pool = new ArrayList<>();
 //        copies genes
@@ -288,10 +287,4 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         return new Animal(this, childEnergy, numberOfGenes,
                 behaviorVariant, animal1.getPosition(), newGenes);
     }
-//    public Map<Vector2d, List<Animal>> getAnimals(){
-//        return animals;
-//    }
-//    public Map<Vector2d, Grass> getGrasses(){
-//        return grasses;
-//    }
 }

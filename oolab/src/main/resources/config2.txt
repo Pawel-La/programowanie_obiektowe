@@ -14,4 +14,3 @@ mutationVariant MinorCorrectionMutation
 numberOfGenes 10
 mapVariant HellPortal
 behaviorVariant LittleBitOfCraziness
-moveDelay 300

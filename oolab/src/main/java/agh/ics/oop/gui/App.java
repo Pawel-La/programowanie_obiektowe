@@ -6,10 +6,11 @@ import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -114,7 +115,7 @@ public class App extends Application{
             int gridHeight = upperRight.y - lowerLeft.y + 2;
 //            setting up grid basic look
             setUpGrid(gridPane, lowerLeft, upperRight);
-            //        adding objects to map
+//            adding objects to map
             for (int i1 = 1; i1 < gridWidth; i1++) {
                 for (int j = 1; j < gridHeight; j++) {
                     Vector2d position = new Vector2d(lowerLeft.x + i1 - 1, upperRight.y - j + 1);
@@ -158,12 +159,13 @@ public class App extends Application{
     }
 
     /**
-     * Setting configuration from file which contains pairs of key value in each line
-     * @param configPath - file path of the file with configurations
-     * @throws FileNotFoundException - thrown if configPath not found
+     * returns map with configurations from file
+     * @param configPath - file path of configurations
+     * @return map with configurations
+     * @throws FileNotFoundException if configPath is not existing
      * @throws RuntimeException - thrown if any line in file has less than two words
      */
-    private void setConfigs(String configPath)
+    private Map<String, String> getConfigsFromFile(String configPath)
             throws FileNotFoundException, RuntimeException {
 //        creating hashmap for keys parameters and value of these parameters
         Map<String, String> configs = new HashMap<>();
@@ -177,6 +179,14 @@ public class App extends Application{
                 throw new RuntimeException("Wrong config file!");
             configs.computeIfAbsent(words[0], k -> words[1]);
         }
+        return configs;
+    }
+
+    /**
+     * Setting configuration from file which contains pairs of key value in each line
+     * @param configs - map with configurations
+     */
+    private void setConfigs(Map<String, String> configs) {
 //        checking all numeric parameters
 //        if any key and value was set in configs then change value of parameter
 //        if parameter not a number, then throws an exception
@@ -211,22 +221,26 @@ public class App extends Application{
         }
 //        checking non-numeric parameters (variants)
 //        if any variant was set then change value of variant parameter
-        switch (configs.get("grassVariant")){
-            case "WoodedEquators" -> grassVariant = new WoodedEquators(mapWidth, mapHeight);
-            case "ToxicCorpses" -> grassVariant = new ToxicCorpses(mapWidth, mapHeight);
-        }
-        switch (configs.get("mutationVariant")){
-            case "MinorCorrectionMutation" -> mutationVariant = new MinorCorrectionMutation();
-            case "CompletelyRandomMutation" -> mutationVariant = new CompletelyRandomMutation();
-        }
-        switch (configs.get("mapVariant")){
-            case "Globe" -> mapVariant = new Globe(mapWidth, mapHeight);
-            case "HellPortal" -> mapVariant = new HellPortal(mapWidth, mapHeight, childEnergy);
-        }
-        switch (configs.get("behaviorVariant")){
-            case "CompletePredestination" -> behaviorVariant = new CompletePredestination();
-            case "LittleBitOfCraziness" -> behaviorVariant = new LittleBitOfCraziness();
-        }
+        if (configs.get("grassVariant") != null)
+            switch (configs.get("grassVariant")){
+                case "WoodedEquators" -> grassVariant = new WoodedEquators(mapWidth, mapHeight);
+                case "ToxicCorpses" -> grassVariant = new ToxicCorpses(mapWidth, mapHeight);
+            }
+        if (configs.get("mutationVariant") != null)
+            switch (configs.get("mutationVariant")){
+                case "MinorCorrectionMutation" -> mutationVariant = new MinorCorrectionMutation();
+                case "CompletelyRandomMutation" -> mutationVariant = new CompletelyRandomMutation();
+            }
+        if (configs.get("mapVariant") != null)
+            switch (configs.get("mapVariant")){
+                case "Globe" -> mapVariant = new Globe(mapWidth, mapHeight);
+                case "HellPortal" -> mapVariant = new HellPortal(mapWidth, mapHeight, childEnergy);
+            }
+        if (configs.get("behaviorVariant") != null)
+            switch (configs.get("behaviorVariant")){
+                case "CompletePredestination" -> behaviorVariant = new CompletePredestination();
+                case "LittleBitOfCraziness" -> behaviorVariant = new LittleBitOfCraziness();
+            }
 //        checking if all given parameters are correct and okay for application to run
         checkIfConfigsAreCorrect();
     }
@@ -329,7 +343,7 @@ public class App extends Application{
 
         button1.setOnAction(value ->  {
             try {
-                setConfigs("src/main/resources/config1.txt");
+                setConfigs(getConfigsFromFile("src/main/resources/config1.txt"));
                 GridPane gridPane1 = new GridPane();
                 VBox vBox1 = new VBox(hBox, gridPane1);
                 Scene scene1 = new Scene(vBox1, 500, 500);
@@ -344,7 +358,7 @@ public class App extends Application{
 
         button2.setOnAction(value ->  {
             try {
-                setConfigs("src/main/resources/config2.txt");
+                setConfigs(getConfigsFromFile("src/main/resources/config2.txt"));
                 GridPane gridPane1 = new GridPane();
                 VBox vBox1 = new VBox(hBox, gridPane1);
                 Scene scene1 = new Scene(vBox1, 500, 500);
@@ -358,20 +372,147 @@ public class App extends Application{
         });
 
         button3.setOnAction(value ->  {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.showOpenDialog(null);
-            try {
-                setConfigs(fileChooser.getSelectedFile().getAbsolutePath());
-                GridPane gridPane1 = new GridPane();
+            GridPane gridPane1 = new GridPane();
+
+            gridPane1.add(new Label("map width: "), 0, 0);
+            TextField mapWidthTF = new TextField();
+            gridPane1.add(mapWidthTF, 1, 0);
+
+            gridPane1.add(new Label("map height: "), 0, 1);
+            TextField mapHeightTF = new TextField();
+            gridPane1.add(mapHeightTF , 1, 1);
+
+            gridPane1.add(new Label("initial number of grasses: "), 0, 2);
+            TextField initNumberOfGrassesTF = new TextField();
+            gridPane1.add(initNumberOfGrassesTF , 1, 2);
+
+            gridPane1.add(new Label("energy that grass gives: "), 0, 3);
+            TextField grassEnergyTF = new TextField();
+            gridPane1.add(grassEnergyTF , 1, 3);
+
+            gridPane1.add(new Label("number of grasses that grow daily: "), 0, 4);
+            TextField grassesDailyTF = new TextField();
+            gridPane1.add(grassesDailyTF , 1, 4);
+
+            gridPane1.add(new Label("grass variant:"), 0, 5);
+            ChoiceBox<String> grassVariantCB = new ChoiceBox<>();
+            grassVariantCB.getItems().add("Wooded Equators");
+            grassVariantCB.getItems().add("Toxic Corpses");
+            gridPane1.add(grassVariantCB , 1, 5);
+
+            gridPane1.add(new Label("initial number of animals: "), 0, 6);
+            TextField initNumberOfAnimalsTF = new TextField();
+            gridPane1.add(initNumberOfAnimalsTF , 1, 6);
+
+            gridPane1.add(new Label("initial animal energy: "), 0, 7);
+            TextField animalEnergyTF = new TextField();
+            gridPane1.add(animalEnergyTF , 1, 7);
+
+            gridPane1.add(new Label("energy for animal to be considered fed: "), 0, 8);
+            TextField fedEnergyTF = new TextField();
+            gridPane1.add(fedEnergyTF , 1, 8);
+
+            gridPane1.add(new Label("initial newborn animal energy: "), 0, 9);
+            TextField childEnergyTF = new TextField();
+            gridPane1.add(childEnergyTF , 1, 9);
+
+            gridPane1.add(new Label("minimal number of mutations: "), 0, 10);
+            TextField minMutationsTF = new TextField();
+            gridPane1.add(minMutationsTF , 1, 10);
+
+            gridPane1.add(new Label("maximal number of mutations: "), 0, 11);
+            TextField maxMutationsTF = new TextField();
+            gridPane1.add(maxMutationsTF , 1, 11);
+
+            gridPane1.add(new Label("mutation variant:"), 0, 12);
+            ChoiceBox<String> mutationVariantCB = new ChoiceBox<>();
+            mutationVariantCB.getItems().add("Completely Random Mutation");
+            mutationVariantCB.getItems().add("Minor Correction Mutation");
+            gridPane1.add(mutationVariantCB , 1, 12);
+
+            gridPane1.add(new Label("length of animal genome: "), 0, 13);
+            TextField numberOfGenesTF = new TextField();
+            gridPane1.add(numberOfGenesTF , 1, 13);
+
+            gridPane1.add(new Label("map variant(edge service):"), 0, 14);
+            ChoiceBox<String> mapVariantCB = new ChoiceBox<>();
+            mapVariantCB.getItems().add("Globe");
+            mapVariantCB.getItems().add("Hell Portal");
+            gridPane1.add(mapVariantCB , 1, 14);
+
+            gridPane1.add(new Label("map variant(edge service):"), 0, 15);
+            ChoiceBox<String> behaviorVariantCB = new ChoiceBox<>();
+            behaviorVariantCB.getItems().add("Complete Predestination");
+            behaviorVariantCB.getItems().add("Little Bit Of Craziness");
+            gridPane1.add(behaviorVariantCB , 1, 15);
+
+            Button button = new Button("Save configs");
+            gridPane1.add(button, 0, 16);
+
+            Scene scene1 = new Scene(gridPane1, 500, 500);
+            Stage stage = new Stage();
+
+            button.setOnAction(e -> {
+                Map<String, String> configs = new HashMap<>();
+                if (!mapWidthTF.getText().isEmpty())
+                    configs.put("mapWidth", mapWidthTF.getText());
+                if (!mapHeightTF.getText().isEmpty())
+                    configs.put("mapHeight", mapHeightTF.getText());
+                if (!initNumberOfGrassesTF.getText().isEmpty())
+                    configs.put("initNumberOfGrasses", initNumberOfGrassesTF.getText());
+                if (!grassEnergyTF.getText().isEmpty())
+                    configs.put("grassEnergy", grassEnergyTF.getText());
+                if (!grassesDailyTF.getText().isEmpty())
+                    configs.put("grassesDaily", grassesDailyTF.getText());
+                if (grassVariantCB.getValue() != null){
+                    if (grassVariantCB.getValue().equals("Wooded Equators"))
+                        configs.put("grassVariant", "WoodedEquators");
+                    else
+                        configs.put("grassVariant", "ToxicCorpses");
+                }
+                if (!initNumberOfAnimalsTF.getText().isEmpty())
+                    configs.put("initNumberOfAnimals", initNumberOfAnimalsTF.getText());
+                if (!animalEnergyTF.getText().isEmpty())
+                    configs.put("animalEnergy", animalEnergyTF.getText());
+                if (!fedEnergyTF.getText().isEmpty())
+                    configs.put("fedEnergy", fedEnergyTF.getText());
+                if (!childEnergyTF.getText().isEmpty())
+                    configs.put("childEnergy", childEnergyTF.getText());
+                if (!minMutationsTF.getText().isEmpty())
+                    configs.put("minMutations", minMutationsTF.getText());
+                if (!maxMutationsTF.getText().isEmpty())
+                    configs.put("maxMutations", maxMutationsTF.getText());
+                if (mutationVariantCB.getValue() != null){
+                    if (mutationVariantCB.getValue().equals("Completely Random Mutation"))
+                        configs.put("mutationVariant", "CompletelyRandomMutation");
+                    else
+                        configs.put("mutationVariant", "MinorCorrectionMutation");
+                }
+                if (!numberOfGenesTF.getText().isEmpty())
+                    configs.put("numberOfGenes", numberOfGenesTF.getText());
+                if (mapVariantCB.getValue() != null){
+                    if (mapVariantCB.getValue().equals("Globe"))
+                        configs.put("mapVariant", "Globe");
+                    else
+                        configs.put("mapVariant", "HellPortal");
+                }
+                if (behaviorVariantCB.getValue() != null){
+                    if (behaviorVariantCB.getValue().equals("Complete Predestination"))
+                        configs.put("behaviorVariant", "CompletePredestination");
+                    else
+                        configs.put("behaviorVariant", "LittleBitOfCraziness");
+                }
+
+                setConfigs(configs);
+                gridPane1.getChildren().clear();
                 VBox vBox1 = new VBox(hBox, gridPane1);
-                Scene scene1 = new Scene(vBox1, 500, 500);
-                Stage stage = new Stage();
-                stage.setScene(scene1);
-                stage.show();
+                Scene scene2 = new Scene(vBox1, 500, 500);
+                stage.setScene(scene2);
                 go(gridPane1);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            });
+
+            stage.setScene(scene1);
+            stage.show();
         });
 
         primaryStage.setScene(scene);
