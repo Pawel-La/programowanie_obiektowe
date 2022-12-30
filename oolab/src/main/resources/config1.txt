@@ -1,0 +1,16 @@
+mapWidth 5
+mapHeight 5
+initNumberOfGrasses 5
+grassEnergy 5
+grassesDaily 5
+grassVariant WoodedEquators
+initNumberOfAnimals 5
+animalEnergy 5
+fedEnergy 5
+childEnergy 5
+minMutations 5
+maxMutations 5
+mutationVariant CompletelyRandomMutation
+numberOfGenes 5
+mapVariant Globe
+behaviorVariant LittleBitOfCraziness
