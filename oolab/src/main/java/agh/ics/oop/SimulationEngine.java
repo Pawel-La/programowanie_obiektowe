@@ -10,6 +10,7 @@ public class SimulationEngine implements IEngine, Runnable{
     private final ToFileWriter toFileWriter = new ToFileWriter();
     private final IWorldMap map;
     private final App app;
+    private final boolean saveToFile;
     private final GridPane gridPane;
     private final int moveDelay;
     private final List<Animal> animals = new ArrayList<>();
@@ -19,6 +20,7 @@ public class SimulationEngine implements IEngine, Runnable{
             IWorldMap map,
             int initNumberOfAnimals,
             App app,
+            boolean saveToFile,
             GridPane gridPane,
             int moveDelay,
             int energy,
@@ -27,17 +29,20 @@ public class SimulationEngine implements IEngine, Runnable{
         this.map = map;
         this.moveDelay = moveDelay;
         this.app = app;
+        this.saveToFile = saveToFile;
         this.gridPane = gridPane;
         for (int i = 0; i < initNumberOfAnimals; i++){
             Animal animal = new Animal(map, energy, numberOfGenes, behaviorVariant);
             map.place(animal);
             animals.add(animal);
         }
-        try {
-            toFileWriter.setTitles();
-        }
-        catch (FileNotFoundException e){
-            e.printStackTrace();
+        if (saveToFile){
+            try {
+                toFileWriter.setTitles();
+            }
+            catch (FileNotFoundException e){
+                e.printStackTrace();
+            }
         }
     }
     private void moves(){
@@ -127,12 +132,14 @@ public class SimulationEngine implements IEngine, Runnable{
         app.update(gridPane, map);
         for (int day = 0; day < 150; day++) {
             System.out.println("day: "+ (day+1));
-            setDailyInfo(day+1);
-            try {
-                toFileWriter.saveDailyInfo();
-            }
-            catch (FileNotFoundException e){
-                e.printStackTrace();
+            if (saveToFile){
+                setDailyInfo(day+1);
+                try {
+                    toFileWriter.saveDailyInfo();
+                }
+                catch (FileNotFoundException e){
+                    e.printStackTrace();
+                }
             }
             try{
                 Thread.sleep(moveDelay);

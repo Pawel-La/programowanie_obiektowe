@@ -14,3 +14,4 @@ mutationVariant CompletelyRandomMutation
 numberOfGenes 5
 mapVariant Globe
 behaviorVariant LittleBitOfCraziness
+saveToFile true

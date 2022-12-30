@@ -5,10 +5,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.File;
@@ -53,6 +50,7 @@ public class App extends Application{
     //    mapVariant - variant of the map (what should happen when animal try to move beyond the edge of map)
     private IBehaviorVariant behaviorVariant;
     //    behaviorVariant - animals behaviour variant (how should animals choose their next move)
+    private boolean saveToFile;
     private int moveDelay;
     //    moveDelay - time delay (in milliseconds) between moves in simulation (set up to 300ms)
     /**
@@ -155,6 +153,7 @@ public class App extends Application{
         numberOfGenes = 3;
         mapVariant = new Globe(mapWidth, mapHeight);
         behaviorVariant = new CompletePredestination();
+        saveToFile = false;
         moveDelay = 300;
     }
 
@@ -241,6 +240,8 @@ public class App extends Application{
                 case "CompletePredestination" -> behaviorVariant = new CompletePredestination();
                 case "LittleBitOfCraziness" -> behaviorVariant = new LittleBitOfCraziness();
             }
+        if (configs.get("saveToFile") != null)
+            saveToFile = configs.get("saveToFile").equals("true");
 //        checking if all given parameters are correct and okay for application to run
         checkIfConfigsAreCorrect();
     }
@@ -320,7 +321,7 @@ public class App extends Application{
                 mapWidth, mapHeight, childEnergy, fedEnergy, minMutations,
                 maxMutations, mutationVariant, behaviorVariant, grassVariant);
         SimulationEngine engine = new SimulationEngine(
-                map, initNumberOfAnimals, this, gridPane,
+                map, initNumberOfAnimals, this, saveToFile, gridPane,
                 moveDelay, animalEnergy, numberOfGenes, behaviorVariant);
         Thread engineThread = new Thread(engine);
         engineThread.start();
@@ -446,8 +447,11 @@ public class App extends Application{
             behaviorVariantCB.getItems().add("Little Bit Of Craziness");
             gridPane1.add(behaviorVariantCB , 1, 15);
 
+            CheckBox checkBox = new CheckBox("save simulation to csv file");
+            gridPane1.add(checkBox , 0, 16);
+
             Button button = new Button("Save configs");
-            gridPane1.add(button, 0, 16);
+            gridPane1.add(button, 0, 17);
 
             Scene scene1 = new Scene(gridPane1, 500, 500);
             Stage stage = new Stage();
@@ -501,6 +505,9 @@ public class App extends Application{
                         configs.put("behaviorVariant", "CompletePredestination");
                     else
                         configs.put("behaviorVariant", "LittleBitOfCraziness");
+                }
+                if (checkBox.isSelected()){
+                    configs.put("saveToFile", "true");
                 }
 
                 setConfigs(configs);

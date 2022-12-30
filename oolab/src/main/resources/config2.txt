@@ -14,3 +14,4 @@ mutationVariant MinorCorrectionMutation
 numberOfGenes 10
 mapVariant HellPortal
 behaviorVariant LittleBitOfCraziness
+saveToFile true
