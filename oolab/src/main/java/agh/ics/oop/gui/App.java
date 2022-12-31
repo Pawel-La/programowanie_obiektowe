@@ -53,6 +53,8 @@ public class App extends Application{
     private boolean saveToFile;
     private int moveDelay;
     //    moveDelay - time delay (in milliseconds) between moves in simulation (set up to 300ms)
+    private int numOfFile;
+    //    numOfFile - number of simulations started (to know where to write a CSV file)
     /**
      * Reset the state of given gridPane
      * @param gridPane - gridPane that certain simulation operate on
@@ -155,6 +157,7 @@ public class App extends Application{
         behaviorVariant = new CompletePredestination();
         saveToFile = false;
         moveDelay = 300;
+        numOfFile = 0;
     }
 
     /**
@@ -317,11 +320,12 @@ public class App extends Application{
      * @param gridPane - gridPane of certain simulation
      */
     private void go(GridPane gridPane){
+        numOfFile++;
         IWorldMap map = new WorldMap(mapVariant, initNumberOfGrasses, grassEnergy, grassesDaily,
                 mapWidth, mapHeight, childEnergy, fedEnergy, minMutations,
                 maxMutations, mutationVariant, behaviorVariant, grassVariant);
         SimulationEngine engine = new SimulationEngine(
-                map, initNumberOfAnimals, this, saveToFile, gridPane,
+                map, initNumberOfAnimals, numOfFile,this, saveToFile, gridPane,
                 moveDelay, animalEnergy, numberOfGenes, behaviorVariant);
         Thread engineThread = new Thread(engine);
         engineThread.start();

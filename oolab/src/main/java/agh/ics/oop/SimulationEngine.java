@@ -9,6 +9,7 @@ import java.util.*;
 public class SimulationEngine implements IEngine, Runnable{
     private final ToFileWriter toFileWriter = new ToFileWriter();
     private final IWorldMap map;
+    private final int numOfFile;
     private final App app;
     private final boolean saveToFile;
     private final GridPane gridPane;
@@ -19,6 +20,7 @@ public class SimulationEngine implements IEngine, Runnable{
     public SimulationEngine (
             IWorldMap map,
             int initNumberOfAnimals,
+            int numOfFile,
             App app,
             boolean saveToFile,
             GridPane gridPane,
@@ -28,6 +30,7 @@ public class SimulationEngine implements IEngine, Runnable{
             IBehaviorVariant behaviorVariant){
         this.map = map;
         this.moveDelay = moveDelay;
+        this.numOfFile = numOfFile;
         this.app = app;
         this.saveToFile = saveToFile;
         this.gridPane = gridPane;
@@ -38,6 +41,7 @@ public class SimulationEngine implements IEngine, Runnable{
         }
         if (saveToFile){
             try {
+                toFileWriter.setNumOfFile(numOfFile);
                 toFileWriter.setTitles();
             }
             catch (FileNotFoundException e){
@@ -131,7 +135,6 @@ public class SimulationEngine implements IEngine, Runnable{
     public void run(){
         app.update(gridPane, map);
         for (int day = 0; day < 150; day++) {
-            System.out.println("day: "+ (day+1));
             if (saveToFile){
                 setDailyInfo(day+1);
                 try {

@@ -1,5 +1,5 @@
-mapWidth 15
-mapHeight 15
+mapWidth 10
+mapHeight 10
 initNumberOfGrasses 25
 grassEnergy 10
 grassesDaily 5

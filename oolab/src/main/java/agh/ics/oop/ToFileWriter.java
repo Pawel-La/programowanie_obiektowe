@@ -2,15 +2,19 @@ package agh.ics.oop;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ToFileWriter {
     private int day, numOfAnimals, numOfGrasses, numOfFreeSpots, averageEnergyForLivingAnimals, averageAgeOfDeath;
+    private int numOfFile;
     private String mostPopularGenes;
     private final List<String[]> dataLines = new ArrayList<>();
-
+    public void setNumOfFile(int numOfFile){
+        this.numOfFile = numOfFile;
+    }
     public void setDay(int day){
         this.day = day;
     }
@@ -46,7 +50,16 @@ public class ToFileWriter {
      * @throws FileNotFoundException if csv file doesn't exist
      */
     private void saveInfoToCSV() throws FileNotFoundException {
-        File csvOutputFile = new File("src/main/resources/info.csv");
+        File csvOutputFile = new File("src/main/resources/info"+numOfFile+".csv");
+        if (!csvOutputFile.exists()){
+            try {
+                csvOutputFile.createNewFile();
+            }
+            catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
             dataLines.stream()
                     .map(this::convertToCSV)
