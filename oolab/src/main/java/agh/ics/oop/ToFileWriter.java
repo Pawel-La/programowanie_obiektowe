@@ -12,27 +12,35 @@ public class ToFileWriter {
     private int numOfFile;
     private String mostPopularGenes;
     private final List<String[]> dataLines = new ArrayList<>();
-    public void setNumOfFile(int numOfFile){
+
+    public void setNumOfFile(int numOfFile) {
         this.numOfFile = numOfFile;
     }
-    public void setDay(int day){
+
+    public void setDay(int day) {
         this.day = day;
     }
+
     public void setNumOfAnimals(int numOfAnimals) {
         this.numOfAnimals = numOfAnimals;
     }
+
     public void setNumOfGrasses(int numOfGrasses) {
         this.numOfGrasses = numOfGrasses;
     }
+
     public void setNumOfFreeSpots(int numOfFreeSpots) {
         this.numOfFreeSpots = numOfFreeSpots;
     }
+
     public void setAverageEnergyForLivingAnimals(int averageEnergyForLivingAnimals) {
         this.averageEnergyForLivingAnimals = averageEnergyForLivingAnimals;
     }
+
     public void setAverageAgeOfDeath(int averageAgeOfDeath) {
         this.averageAgeOfDeath = averageAgeOfDeath;
     }
+
     public void setMostPopularGenes(String mostPopularGenes) {
         this.mostPopularGenes = mostPopularGenes;
     }
@@ -47,16 +55,16 @@ public class ToFileWriter {
 
     /**
      * saves information saved in dataLines to csv file
+     *
      * @throws FileNotFoundException if csv file doesn't exist
      */
     private void saveInfoToCSV() throws FileNotFoundException {
-        File csvOutputFile = new File("src/main/resources/info"+numOfFile+".csv");
-        if (!csvOutputFile.exists()){
+        File csvOutputFile = new File("src/main/resources/info" + numOfFile + ".csv");
+        if (!csvOutputFile.exists()) {
             try {
                 csvOutputFile.createNewFile();
-            }
-            catch (IOException e){
-                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace(); // to nie jest dobra obsługa wyjątku
             }
         }
 
@@ -69,6 +77,7 @@ public class ToFileWriter {
 
     /**
      * Sets titles of columns in csv file
+     *
      * @throws FileNotFoundException if csv file doesn't exist
      */
     public void setTitles() throws FileNotFoundException {
@@ -86,6 +95,7 @@ public class ToFileWriter {
 
     /**
      * save daily info to a csv file
+     *
      * @throws FileNotFoundException if csv file doesn't exist
      */
     public void saveDailyInfo() throws FileNotFoundException {

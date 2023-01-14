@@ -9,20 +9,20 @@ public class Animal implements IMapElement {
     private MapDirection orientation;
     private Vector2d position;
     private final IWorldMap map;
-    private final int numberOfGenes;
+    private final int numberOfGenes;  // przydałaby się klasa dla genomu
     private int activeGene;
-    private final int [] genes;
+    private final int[] genes;
     private final IBehaviorVariant behaviorVariant;
     private int energy;
     private int eatenGrasses;
     private int children;
     private int age;
 
-//    added (not born) animals constructor
+    //    added (not born) animals constructor
     public Animal(IWorldMap map,
                   int energy,
                   int numberOfGenes,
-                  IBehaviorVariant behaviorVariant){
+                  IBehaviorVariant behaviorVariant) {
         this.map = map;
         this.energy = energy;
         this.numberOfGenes = numberOfGenes;
@@ -39,13 +39,14 @@ public class Animal implements IMapElement {
 
         activeGene = random.nextInt(numberOfGenes);
     }
-//    born animals constructor
+
+    //    born animals constructor
     public Animal(IWorldMap map,
                   int energy,
                   int numberOfGenes,
                   IBehaviorVariant behaviorVariant,
                   Vector2d position,
-                  int [] genes){
+                  int[] genes) {
         this.map = map;
         this.energy = energy;
         this.numberOfGenes = numberOfGenes;
@@ -59,9 +60,10 @@ public class Animal implements IMapElement {
 
         activeGene = random.nextInt(numberOfGenes);
     }
+
     @Override
-    public String toString(){
-        return switch (this.orientation){
+    public String toString() {
+        return switch (this.orientation) {
             case NORTH -> "N";
             case SOUTH -> "S";
             case WEST -> "W";
@@ -72,31 +74,35 @@ public class Animal implements IMapElement {
             case NORTH_WEST -> "NW";
         };
     }
+
     @Override
-    public Vector2d getPosition(){
+    public Vector2d getPosition() {
         return position;
     }
+
     public void setPosition(Vector2d position) {
         this.position = position;
     }
+
     @Override
     public String getMapElementLookFile() {
-        if (this.energy >= 15){
+        if (this.energy >= 15) {
             return "src/main/resources/highHp.png";
-        }
-        else if (this.energy >= 7){
+        } else if (this.energy >= 7) {
             return "src/main/resources/mediumHp.png";
         }
         return "src/main/resources/lowHp.png";
     }
-    public MapDirection getOrientation(){
+
+    public MapDirection getOrientation() {
         return orientation;
     }
+
     public void turnAround() {
         orientation = orientation.turn(4);
     }
 
-    public void move(){
+    public void move() {
         if (energy <= 0)
             throw new RuntimeException("Animal is dead");
 
@@ -109,52 +115,64 @@ public class Animal implements IMapElement {
         oldPosition = position;
         possiblePosition = position.add(orientation.toUnitVector());
 
-        if (map.inBounds(possiblePosition)){
+        if (map.inBounds(possiblePosition)) {
             position = possiblePosition;
-        }
-        else {
+        } else {
             map.edgeService(this);
         }
         positionChanged(oldPosition, position);
     }
-    public boolean isDead(){
+
+    public boolean isDead() {
         return energy <= 0;
     }
+
     public int[] getGenes() {
-        return genes;
+        return genes; // dehermetyzacja
     }
-    public int getActiveGene() {
+
+    public int getActiveGene() { // public?
         return activeGene;
     }
+
     public int getAge() {
         return age;
     }
+
     public int getChildren() {
         return children;
     }
-    public void addChildren(){
+
+    public void addChildren() {
         children += 1;
     }
+
     public int getEnergy() {
         return energy;
     }
-    public void addEnergy(int x){
+
+    public void addEnergy(int x) {
         energy += x;
     }
-    public void lowerEnergy(int x){
+
+    public void lowerEnergy(int x) {
         energy -= x;
     }
-    public int getEatenGrasses(){
+
+    public int getEatenGrasses() {
         return eatenGrasses;
     }
-    public void addGrassesEaten(){
+
+    public void addGrassesEaten() {
         eatenGrasses++;
     }
-    public void addObserver(IPositionChangeObserver observer){
+
+    public void addObserver(IPositionChangeObserver observer) {
         observers.add(observer);
     }
-    private void positionChanged(Vector2d oldPosition, Vector2d newPosition){
-        for(IPositionChangeObserver observer : observers){
+
+    private void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+        for (IPositionChangeObserver observer : observers) {
             observer.positionChanged(this, oldPosition, newPosition);
         }
     }

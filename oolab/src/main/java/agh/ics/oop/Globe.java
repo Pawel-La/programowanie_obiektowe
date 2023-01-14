@@ -1,9 +1,10 @@
 package agh.ics.oop;
 
-public class Globe implements IMapVariant{
+public class Globe implements IMapVariant {
     private final int mapWidth;
     private final int mapHeight;
-    public Globe(int mapWidth, int mapHeight){
+
+    public Globe(int mapWidth, int mapHeight) {
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
     }
@@ -11,7 +12,8 @@ public class Globe implements IMapVariant{
 
     /**
      * Sets new position/orientation of animal
-     * @param animal - animal that tried to move beyond world bounds
+     *
+     * @param animal   - animal that tried to move beyond world bounds
      * @param position - position out of bounds that animal tried to move to
      */
     @Override

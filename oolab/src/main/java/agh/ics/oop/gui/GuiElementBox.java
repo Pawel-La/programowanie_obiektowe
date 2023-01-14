@@ -18,13 +18,15 @@ import java.io.FileNotFoundException;
  */
 public class GuiElementBox {
     private final VBox vBox;
-    public VBox getVBox(){
+
+    public VBox getVBox() {
         return vBox;
     }
+
     GuiElementBox(IMapElement mapElement) throws FileNotFoundException {
 //        gets image from file and crop it to 20x20
         Image image = new Image(new FileInputStream(mapElement.getMapElementLookFile()),
-                20 , 20, false, false);
+                20, 20, false, false);
 //        creates imageView and sets its size also to 20x20
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(20);

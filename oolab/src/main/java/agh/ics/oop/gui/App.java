@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.Scanner;
 /**
  * Class extends Application and is a main class that allows us to use javaFX successfully
  */
-public class App extends Application{
+public class App extends Application {
     private int mapWidth;
     //    mapWidth - width of map
     private int mapHeight;
@@ -55,11 +56,13 @@ public class App extends Application{
     //    moveDelay - time delay (in milliseconds) between moves in simulation (set up to 300ms)
     private int numOfFile;
     //    numOfFile - number of simulations started (to know where to write a CSV file)
+
     /**
      * Reset the state of given gridPane
+     *
      * @param gridPane - gridPane that certain simulation operate on
      */
-    private void reset(GridPane gridPane){
+    private void reset(GridPane gridPane) {
         gridPane.setGridLinesVisible(false);
         gridPane.getColumnConstraints().clear();
         gridPane.getRowConstraints().clear();
@@ -67,7 +70,7 @@ public class App extends Application{
         gridPane.setGridLinesVisible(true);
     }
 
-    private void setUpGrid(GridPane gridPane, Vector2d lowerLeft, Vector2d upperRight){
+    private void setUpGrid(GridPane gridPane, Vector2d lowerLeft, Vector2d upperRight) {
 //            calculating and setting up width and height of grid to show
         int gridWidth = upperRight.x - lowerLeft.x + 2;
         int gridHeight = upperRight.y - lowerLeft.y + 2;
@@ -100,10 +103,11 @@ public class App extends Application{
 
     /**
      * Update the state of given gridPane to actual state of given map
+     *
      * @param gridPane - gridPane that certain simulation operate on
-     * @param map - map that the simulation operate on
+     * @param map      - map that the simulation operate on
      */
-    public void update(GridPane gridPane, IWorldMap map){
+    public void update(GridPane gridPane, IWorldMap map) {
 //        we create new thread to run update on
         Thread mapThread = new Thread(() -> Platform.runLater(() -> {
 //            first we clear gridPane state
@@ -138,7 +142,7 @@ public class App extends Application{
     /**
      * setting up default configs, if a config is not changed by user it is set to value set here
      */
-    private void setDefaultConfigs(){
+    private void setDefaultConfigs() {
         mapWidth = 5;
         mapHeight = 5;
         initNumberOfGrasses = 5;
@@ -162,10 +166,11 @@ public class App extends Application{
 
     /**
      * returns map with configurations from file
+     *
      * @param configPath - file path of configurations
      * @return map with configurations
      * @throws FileNotFoundException if configPath is not existing
-     * @throws RuntimeException - thrown if any line in file has less than two words
+     * @throws RuntimeException      - thrown if any line in file has less than two words
      */
     private Map<String, String> getConfigsFromFile(String configPath)
             throws FileNotFoundException, RuntimeException {
@@ -174,9 +179,9 @@ public class App extends Application{
         File config = new File(configPath);
         Scanner scanner = new Scanner(config);
 //        reading every line of file, setting first word to key and second word to value
-        while(scanner.hasNextLine()){
+        while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            String [] words = line.split(" ", 2);
+            String[] words = line.split(" ", 2);
             if (words.length < 2)
                 throw new RuntimeException("Wrong config file!");
             configs.computeIfAbsent(words[0], k -> words[1]);
@@ -186,6 +191,7 @@ public class App extends Application{
 
     /**
      * Setting configuration from file which contains pairs of key value in each line
+     *
      * @param configs - map with configurations
      */
     private void setConfigs(Map<String, String> configs) {
@@ -217,29 +223,28 @@ public class App extends Application{
                 maxMutations = Integer.parseInt(configs.get("maxMutations"));
             if (configs.get("numberOfGenes") != null)
                 numberOfGenes = Integer.parseInt(configs.get("numberOfGenes"));
-        }
-        catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             ex.printStackTrace();
         }
 //        checking non-numeric parameters (variants)
 //        if any variant was set then change value of variant parameter
         if (configs.get("grassVariant") != null)
-            switch (configs.get("grassVariant")){
+            switch (configs.get("grassVariant")) {
                 case "WoodedEquators" -> grassVariant = new WoodedEquators(mapWidth, mapHeight);
                 case "ToxicCorpses" -> grassVariant = new ToxicCorpses(mapWidth, mapHeight);
             }
         if (configs.get("mutationVariant") != null)
-            switch (configs.get("mutationVariant")){
+            switch (configs.get("mutationVariant")) {
                 case "MinorCorrectionMutation" -> mutationVariant = new MinorCorrectionMutation();
                 case "CompletelyRandomMutation" -> mutationVariant = new CompletelyRandomMutation();
             }
         if (configs.get("mapVariant") != null)
-            switch (configs.get("mapVariant")){
+            switch (configs.get("mapVariant")) {
                 case "Globe" -> mapVariant = new Globe(mapWidth, mapHeight);
                 case "HellPortal" -> mapVariant = new HellPortal(mapWidth, mapHeight, childEnergy);
             }
         if (configs.get("behaviorVariant") != null)
-            switch (configs.get("behaviorVariant")){
+            switch (configs.get("behaviorVariant")) {
                 case "CompletePredestination" -> behaviorVariant = new CompletePredestination();
                 case "LittleBitOfCraziness" -> behaviorVariant = new LittleBitOfCraziness();
             }
@@ -252,9 +257,10 @@ public class App extends Application{
     /**
      * Checking all parameters values if they are correct and if those parameters are okay for app to run.
      * If anything is wrong with parameters, then throws an exception
+     *
      * @throws RuntimeException - if parameters can't work, throws exception with accurate comment about what went wrong.
      */
-    private void checkIfConfigsAreCorrect() throws RuntimeException{
+    private void checkIfConfigsAreCorrect() throws RuntimeException {
         if (mapWidth <= 0)
             throw new RuntimeException(
                     "parameter mapWidth value must be positive!");
@@ -317,26 +323,29 @@ public class App extends Application{
 
     /**
      * Creates new map, creates new engine and new thread for engine, then runs new created thread
+     *
      * @param gridPane - gridPane of certain simulation
      */
-    private void go(GridPane gridPane){
+    private void go(GridPane gridPane) {
         numOfFile++;
         IWorldMap map = new WorldMap(mapVariant, initNumberOfGrasses, grassEnergy, grassesDaily,
                 mapWidth, mapHeight, childEnergy, fedEnergy, minMutations,
                 maxMutations, mutationVariant, behaviorVariant, grassVariant);
         SimulationEngine engine = new SimulationEngine(
-                map, initNumberOfAnimals, numOfFile,this, saveToFile, gridPane,
+                map, initNumberOfAnimals, numOfFile, this, saveToFile, gridPane,
                 moveDelay, animalEnergy, numberOfGenes, behaviorVariant);
         Thread engineThread = new Thread(engine);
         engineThread.start();
     }
+
     /**
      * Creates first stage and scene, if any button is clicked then set up new stage and gridPane.
      * Also, either set up saved configs or get configs from user
+     *
      * @param primaryStage - primary stage
      */
     @Override
-    public void start(Stage primaryStage){
+    public void start(Stage primaryStage) {
 
         GridPane gridPane = new GridPane();
         Button button1 = new Button("Config 1");
@@ -346,7 +355,7 @@ public class App extends Application{
         VBox vBox = new VBox(hBox, gridPane);
         Scene scene = new Scene(vBox, 500, 500);
 
-        button1.setOnAction(value ->  {
+        button1.setOnAction(value -> {
             try {
                 setConfigs(getConfigsFromFile("src/main/resources/config1.txt"));
                 GridPane gridPane1 = new GridPane();
@@ -361,7 +370,7 @@ public class App extends Application{
             }
         });
 
-        button2.setOnAction(value ->  {
+        button2.setOnAction(value -> {
             try {
                 setConfigs(getConfigsFromFile("src/main/resources/config2.txt"));
                 GridPane gridPane1 = new GridPane();
@@ -376,7 +385,7 @@ public class App extends Application{
             }
         });
 
-        button3.setOnAction(value ->  {
+        button3.setOnAction(value -> {
             GridPane gridPane1 = new GridPane();
 
             gridPane1.add(new Label("map width: "), 0, 0);
@@ -385,74 +394,74 @@ public class App extends Application{
 
             gridPane1.add(new Label("map height: "), 0, 1);
             TextField mapHeightTF = new TextField();
-            gridPane1.add(mapHeightTF , 1, 1);
+            gridPane1.add(mapHeightTF, 1, 1);
 
             gridPane1.add(new Label("initial number of grasses: "), 0, 2);
             TextField initNumberOfGrassesTF = new TextField();
-            gridPane1.add(initNumberOfGrassesTF , 1, 2);
+            gridPane1.add(initNumberOfGrassesTF, 1, 2);
 
             gridPane1.add(new Label("energy that grass gives: "), 0, 3);
             TextField grassEnergyTF = new TextField();
-            gridPane1.add(grassEnergyTF , 1, 3);
+            gridPane1.add(grassEnergyTF, 1, 3);
 
             gridPane1.add(new Label("number of grasses that grow daily: "), 0, 4);
             TextField grassesDailyTF = new TextField();
-            gridPane1.add(grassesDailyTF , 1, 4);
+            gridPane1.add(grassesDailyTF, 1, 4);
 
             gridPane1.add(new Label("grass variant:"), 0, 5);
             ChoiceBox<String> grassVariantCB = new ChoiceBox<>();
             grassVariantCB.getItems().add("Wooded Equators");
             grassVariantCB.getItems().add("Toxic Corpses");
-            gridPane1.add(grassVariantCB , 1, 5);
+            gridPane1.add(grassVariantCB, 1, 5);
 
             gridPane1.add(new Label("initial number of animals: "), 0, 6);
             TextField initNumberOfAnimalsTF = new TextField();
-            gridPane1.add(initNumberOfAnimalsTF , 1, 6);
+            gridPane1.add(initNumberOfAnimalsTF, 1, 6);
 
             gridPane1.add(new Label("initial animal energy: "), 0, 7);
             TextField animalEnergyTF = new TextField();
-            gridPane1.add(animalEnergyTF , 1, 7);
+            gridPane1.add(animalEnergyTF, 1, 7);
 
             gridPane1.add(new Label("energy for animal to be considered fed: "), 0, 8);
             TextField fedEnergyTF = new TextField();
-            gridPane1.add(fedEnergyTF , 1, 8);
+            gridPane1.add(fedEnergyTF, 1, 8);
 
             gridPane1.add(new Label("initial newborn animal energy: "), 0, 9);
             TextField childEnergyTF = new TextField();
-            gridPane1.add(childEnergyTF , 1, 9);
+            gridPane1.add(childEnergyTF, 1, 9);
 
             gridPane1.add(new Label("minimal number of mutations: "), 0, 10);
             TextField minMutationsTF = new TextField();
-            gridPane1.add(minMutationsTF , 1, 10);
+            gridPane1.add(minMutationsTF, 1, 10);
 
             gridPane1.add(new Label("maximal number of mutations: "), 0, 11);
             TextField maxMutationsTF = new TextField();
-            gridPane1.add(maxMutationsTF , 1, 11);
+            gridPane1.add(maxMutationsTF, 1, 11);
 
             gridPane1.add(new Label("mutation variant:"), 0, 12);
             ChoiceBox<String> mutationVariantCB = new ChoiceBox<>();
             mutationVariantCB.getItems().add("Completely Random Mutation");
             mutationVariantCB.getItems().add("Minor Correction Mutation");
-            gridPane1.add(mutationVariantCB , 1, 12);
+            gridPane1.add(mutationVariantCB, 1, 12);
 
             gridPane1.add(new Label("length of animal genome: "), 0, 13);
             TextField numberOfGenesTF = new TextField();
-            gridPane1.add(numberOfGenesTF , 1, 13);
+            gridPane1.add(numberOfGenesTF, 1, 13);
 
             gridPane1.add(new Label("map variant(edge service):"), 0, 14);
             ChoiceBox<String> mapVariantCB = new ChoiceBox<>();
             mapVariantCB.getItems().add("Globe");
             mapVariantCB.getItems().add("Hell Portal");
-            gridPane1.add(mapVariantCB , 1, 14);
+            gridPane1.add(mapVariantCB, 1, 14);
 
             gridPane1.add(new Label("map variant(edge service):"), 0, 15);
             ChoiceBox<String> behaviorVariantCB = new ChoiceBox<>();
             behaviorVariantCB.getItems().add("Complete Predestination");
             behaviorVariantCB.getItems().add("Little Bit Of Craziness");
-            gridPane1.add(behaviorVariantCB , 1, 15);
+            gridPane1.add(behaviorVariantCB, 1, 15);
 
             CheckBox checkBox = new CheckBox("save simulation to csv file");
-            gridPane1.add(checkBox , 0, 16);
+            gridPane1.add(checkBox, 0, 16);
 
             Button button = new Button("Save configs");
             gridPane1.add(button, 0, 17);
@@ -472,7 +481,7 @@ public class App extends Application{
                     configs.put("grassEnergy", grassEnergyTF.getText());
                 if (!grassesDailyTF.getText().isEmpty())
                     configs.put("grassesDaily", grassesDailyTF.getText());
-                if (grassVariantCB.getValue() != null){
+                if (grassVariantCB.getValue() != null) {
                     if (grassVariantCB.getValue().equals("Wooded Equators"))
                         configs.put("grassVariant", "WoodedEquators");
                     else
@@ -490,7 +499,7 @@ public class App extends Application{
                     configs.put("minMutations", minMutationsTF.getText());
                 if (!maxMutationsTF.getText().isEmpty())
                     configs.put("maxMutations", maxMutationsTF.getText());
-                if (mutationVariantCB.getValue() != null){
+                if (mutationVariantCB.getValue() != null) {
                     if (mutationVariantCB.getValue().equals("Completely Random Mutation"))
                         configs.put("mutationVariant", "CompletelyRandomMutation");
                     else
@@ -498,19 +507,19 @@ public class App extends Application{
                 }
                 if (!numberOfGenesTF.getText().isEmpty())
                     configs.put("numberOfGenes", numberOfGenesTF.getText());
-                if (mapVariantCB.getValue() != null){
+                if (mapVariantCB.getValue() != null) {
                     if (mapVariantCB.getValue().equals("Globe"))
                         configs.put("mapVariant", "Globe");
                     else
                         configs.put("mapVariant", "HellPortal");
                 }
-                if (behaviorVariantCB.getValue() != null){
+                if (behaviorVariantCB.getValue() != null) {
                     if (behaviorVariantCB.getValue().equals("Complete Predestination"))
                         configs.put("behaviorVariant", "CompletePredestination");
                     else
                         configs.put("behaviorVariant", "LittleBitOfCraziness");
                 }
-                if (checkBox.isSelected()){
+                if (checkBox.isSelected()) {
                     configs.put("saveToFile", "true");
                 }
 
